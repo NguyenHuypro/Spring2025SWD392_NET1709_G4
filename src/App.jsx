@@ -1,5 +1,14 @@
+import { RouterProvider } from "react-router-dom";
+import { router } from "./configs/router";
+import { ToastContainer } from "react-toastify";
+
 function App() {
-  return <div>xin chào swd392</div>;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </>
+  );
 }
 
 export default App;
