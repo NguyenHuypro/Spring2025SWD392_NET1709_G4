@@ -4,9 +4,11 @@ import Footer from "../../components/footer";
 
 function UserLayout() {
   return (
-    <div>
+    <div className="layout">
       <Header />
-      <Outlet />
+      <div className="content">
+        <Outlet />
+      </div>
       <Footer />
     </div>
   );

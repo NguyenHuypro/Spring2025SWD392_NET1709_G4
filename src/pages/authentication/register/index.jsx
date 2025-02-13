@@ -3,13 +3,21 @@ import "./index.scss";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import api from "../../../configs/axios";
+import { toast } from "react-toastify";
 
 function Register() {
   const navigate = useNavigate();
   const [form] = useForm();
   const handleRegister = async (value) => {
-    console.log(value);
-    const res = await api.post("/auth/register");
+    try {
+      console.log(value);
+      const res = await api.post("/auth/register", value);
+      console.log(res);
+      toast.success("Đăng kí thành công");
+      navigate("/login");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -77,7 +85,7 @@ function Register() {
 
             <Form.Item
               label="Confirm Password"
-              name="confirmPassword"
+              name="passwordConfirmed"
               dependencies={["password"]}
               rules={[
                 {

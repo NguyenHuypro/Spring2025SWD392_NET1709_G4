@@ -4,15 +4,22 @@ import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { login } from "../../../redux/features/counterSlice";
 
 function Login() {
   const navigate = useNavigate();
   const [form] = useForm();
+  const dispatch = useDispatch();
 
   const handleLogin = async (value) => {
     console.log(value);
     try {
-      const res = await api.get("/auth/login");
+      const res = await api.post("/auth/login", value);
+      console.log(res.data);
+      localStorage.setItem("token", res?.data?.result.accessToken);
+      dispatch(login(res?.data?.result));
+      navigate("/");
       toast.success("Đăng nhập thành công");
     } catch (error) {
       toast.error("Sai email hoặc mật khẩu");

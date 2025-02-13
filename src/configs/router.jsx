@@ -1,7 +1,21 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import UserLayout from "../layout/user";
 import Login from "../pages/authentication/login";
 import Register from "../pages/authentication/register";
+import Home from "../pages/user/home";
+import { useSelector } from "react-redux";
+import { selectUser } from "../redux/features/counterSlice";
+import { toast } from "react-toastify";
+import MyCars from "../pages/user/my-cars";
+
+export const ProtectedRouteUser = ({ children }) => {
+  const user = useSelector(selectUser);
+  if (user?.role === "CUSTOMER") {
+    toast.error("Bạn không có quyền thực hiện hành động này");
+    return <Navigate to={"/"} />;
+  }
+  return children;
+};
 
 export const router = createBrowserRouter([
   {
@@ -10,12 +24,17 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <h1>Home page</h1>,
+        element: <Home />,
       },
       {
-        path: "about",
-        element: <h1>About page</h1>,
+        path: "my-cars",
+        element: (
+          <ProtectedRouteUser>
+            <MyCars />
+          </ProtectedRouteUser>
+        ),
       },
+      {},
     ],
   },
   {

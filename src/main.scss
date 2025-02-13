@@ -3,3 +3,21 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+/* Cấu trúc toàn bộ trang */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Chiều cao tối thiểu bằng toàn bộ màn hình */
+}
+
+/* Nội dung chính cần có margin-top bằng header */
+.content {
+  flex: 1; /* Đảm bảo nội dung chính chiếm phần còn lại của trang */
+  margin-top: 10vh;
+}
+
+body {
+  // overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}

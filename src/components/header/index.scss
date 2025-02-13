@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  position: fixed;
+  justify-content: space-between;
+  height: 10vh;
+  width: 100%;
+  margin-bottom: 10px;
+  align-items: center;
+  padding: 0 10vw;
+  background-color: "white";
+
+  &-left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    &__logo {
+      cursor: pointer;
+    }
+  }
+
+  &-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+}
+
+a {
+  color: black;
+}
