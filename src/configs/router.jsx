@@ -7,10 +7,11 @@ import { useSelector } from "react-redux";
 import { selectUser } from "../redux/features/counterSlice";
 import { toast } from "react-toastify";
 import MyCars from "../pages/user/my-cars";
+import Profile from "../pages/user/profile";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
-  if (user?.role === "CUSTOMER") {
+  if (user?.role !== "Customer") {
     toast.error("Bạn không có quyền thực hiện hành động này");
     return <Navigate to={"/"} />;
   }
@@ -34,7 +35,15 @@ export const router = createBrowserRouter([
           </ProtectedRouteUser>
         ),
       },
-      {},
+
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRouteUser>
+            <Profile />
+          </ProtectedRouteUser>
+        ),
+      },
     ],
   },
   {
