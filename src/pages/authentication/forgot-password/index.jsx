@@ -1,33 +1,24 @@
 import { useNavigate } from "react-router-dom";
-import "./index.scss";
+// import "./index.scss";
 import { Button, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { login } from "../../../redux/features/counterSlice";
 
-function Login() {
+function ForgotPassword() {
   const navigate = useNavigate();
   const [form] = useForm();
-  const dispatch = useDispatch();
 
-  const handleLogin = async (value) => {
+  const handleSubmitForm = async (value) => {
     console.log(value);
     try {
-      const res = await api.post("/auth/login", value);
+      const res = await api.post("/auth/forgot-password", value);
       console.log(res.data);
       if (!res.data.errorCode) {
-        // localStorage.setItem("token", res?.data?.result.accessToken);
-        localStorage.setItem("token", res?.data?.access_token);
-        dispatch(login(res?.data));
-        navigate("/");
-        toast.success("Đăng nhập thành công");
-      } else {
-        toast.error(res.data.message);
+        toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error("Sai email hoặc mật khẩu");
+      toast.error(error.message);
     }
   };
 
@@ -36,8 +27,8 @@ function Login() {
       <div className="container">
         <input type="checkbox" id="check" />
         <div className="login form">
-          <header>Login</header>
-          <Form labelCol={{ span: 24 }} form={form} onFinish={handleLogin}>
+          <header>Quên mật khẩu</header>
+          <Form labelCol={{ span: 24 }} form={form} onFinish={handleSubmitForm}>
             <Form.Item
               label="Email"
               name="email"
@@ -54,18 +45,6 @@ function Login() {
             >
               <Input type="email" />
             </Form.Item>
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password",
-                },
-              ]}
-            >
-              <Input type="password" />
-            </Form.Item>
           </Form>
           <Button
             type="primary"
@@ -74,7 +53,7 @@ function Login() {
               form.submit();
             }}
           >
-            Đăng nhập
+            Gửi yêu cầu
           </Button>
           <div className="signup">
             <span className="signup">
@@ -93,11 +72,11 @@ function Login() {
             <span className="signup">
               <label
                 onClick={() => {
-                  navigate("/forgot-password");
+                  navigate("/login");
                 }}
                 style={{ color: "#1677ff" }}
               >
-                Quên mật khẩu
+                Đăng nhập
               </label>
             </span>
           </div>
@@ -107,4 +86,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

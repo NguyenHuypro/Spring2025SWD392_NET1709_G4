@@ -13,8 +13,12 @@ function Register() {
       console.log(value);
       const res = await api.post("/auth/register", value);
       console.log(res);
-      toast.success("Đăng kí thành công");
-      navigate("/login");
+      if (!res.data.errorCode) {
+        toast.success("Đăng kí thành công");
+        navigate("/login");
+      } else {
+        toast.error(res.data.message);
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -44,7 +48,7 @@ function Register() {
             </Form.Item>
             <Form.Item
               label="Fullname"
-              name="fullname"
+              name="fullName"
               rules={[
                 {
                   required: true,
@@ -116,14 +120,14 @@ function Register() {
           </Button>
           <div className="signup">
             <span className="signup">
-              Already have an account?
+              Đã có tài khoản?
               <label
                 onClick={() => {
                   navigate("/login");
                 }}
                 style={{ color: "#1677ff" }}
               >
-                Login
+                Đăng nhập
               </label>
             </span>
           </div>

@@ -1,8 +1,27 @@
-import { Button, Table } from "antd";
+import { Button, Form, Input, InputNumber, Modal, Select, Table } from "antd";
 import { useForm } from "antd/es/form/Form";
+import FormItem from "antd/es/form/FormItem";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../../redux/features/counterSlice";
+import api from "../../../configs/axios";
+import { toast } from "react-toastify";
 
 function MyCars() {
   const [form] = useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dataSource, setDataSource] = useState([]);
+  const user = useSelector(selectUser);
+
+  const handleOk = () => {
+    form.submit();
+    // setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setIsModalOpen(false);
+  };
 
   const columns = [
     {
@@ -31,6 +50,11 @@ function MyCars() {
       key: "licensePlate",
     },
     {
+      title: "Gói hiện tại",
+      dataIndex: "package",
+      key: "package",
+    },
+    {
       title: "Thao tác",
       key: "id",
       render: () => (
@@ -44,22 +68,133 @@ function MyCars() {
     },
   ];
 
+  const handleSubmitForm = async (value) => {
+    try {
+      const res = await api.post("/cars", value);
+      console.log(res);
+      if (!res.data.errorCode) {
+        setDataSource([...dataSource, res.data]);
+        form.resetFields();
+        setIsModalOpen(false);
+        toast.success("Tạo xe mới thành công");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCarByUserId = async () => {
+    try {
+      const res = await api.get("/cars/my-cars");
+      if (!res.data.errorCode) {
+        setDataSource(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCarByUserId();
+  }, []);
+
   return (
     <div>
-      <Button type="primary">Thêm xe mới</Button>
+      <Button
+        type="primary"
+        onClick={() => {
+          setIsModalOpen(true);
+        }}
+      >
+        Thêm xe mới
+      </Button>
 
-      <Table
-        dataSource={[
-          {
-            brand: "Mercedes",
-            model: "G63",
-            color: "Đen",
-            numberOfSeats: 5,
-            licensePlate: "51L-12345",
-          },
-        ]}
-        columns={columns}
-      />
+      <Table dataSource={dataSource} columns={columns} />
+      <Modal
+        title="Thêm xe mới"
+        open={isModalOpen}
+        onCancel={handleCancel}
+        onOk={handleOk}
+      >
+        <Form form={form} labelCol={{ span: 24 }} onFinish={handleSubmitForm}>
+          <FormItem
+            label="Hãng xe"
+            name="brand"
+            rules={[
+              {
+                required: true,
+                message: "Hãng xe không được để trống",
+              },
+            ]}
+          >
+            {/* <Input /> */}
+            <Select
+              options={[
+                { label: "Toyota", value: "Toyota" },
+                { label: "Honda", value: "Honda" },
+                { label: "Mazda", value: "Mazda" },
+                { label: "Audi", value: "Audi" },
+                { label: "Mercedes-Benz", value: "Mercedes-Benz" },
+              ]}
+            />
+          </FormItem>
+          <FormItem
+            label="Dòng xe"
+            name="model"
+            rules={[
+              {
+                required: true,
+                message: "Dòng xe không được để trống",
+              },
+            ]}
+          >
+            <Input />
+          </FormItem>
+          <FormItem
+            label="Màu xe"
+            name="color"
+            rules={[
+              {
+                required: true,
+                message: "Màu xe không được để trống",
+              },
+            ]}
+          >
+            <Input />
+          </FormItem>
+          <FormItem
+            label="Số lượng chỗ ngồi"
+            name="numberOfSeats"
+            rules={[
+              {
+                required: true,
+                message: "Số lượng chỗ ngồi không được để trống",
+              },
+              {
+                pattern: /^[0-9]{1,2}$/,
+                message: "Số lượng chỗ ngồi chỉ được nhập tối đa 2 chữ số",
+              },
+            ]}
+          >
+            <Input maxLength={2} />
+          </FormItem>
+
+          <FormItem
+            label="Biển số xe"
+            name="licensePlate"
+            rules={[
+              {
+                required: true,
+                message: "Biển số xe không được để trống",
+              },
+            ]}
+          >
+            <Input />
+          </FormItem>
+        </Form>
+      </Modal>
     </div>
   );
 }

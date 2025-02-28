@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import "./index.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Select } from "antd";
+import { PlusOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Select, Upload } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectUser } from "../../redux/features/counterSlice";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
 import FormItem from "antd/es/form/FormItem";
+import api from "../../configs/axios";
+import uploadFile from "../../utils/upload";
 
 function Header() {
   const navigate = useNavigate();
@@ -16,17 +18,41 @@ function Header() {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = useForm();
+  const [cars, setCars] = useState([]);
+  const [fileList, setFileList] = useState([]);
+
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    setIsModalOpen(false);
+    form.submit();
   };
 
   const handleCancel = () => {
+    form.resetFields();
     setIsModalOpen(false);
+  };
+
+  const fetchCarByUserId = async () => {
+    try {
+      const res = await api.get("/cars/my-cars");
+      if (!res.data.errorCode) {
+        setCars(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmitForm = async (value) => {
+    console.log(value);
+    const url = await uploadFile(value.image.fileList[0].originFileObj);
+    console.log(url);
   };
 
   return (
@@ -50,6 +76,7 @@ function Header() {
               type="primary"
               onClick={() => {
                 setIsModalOpen(true);
+                fetchCarByUserId();
               }}
             >
               Đặt cứu hộ ngay
@@ -60,14 +87,18 @@ function Header() {
               onCancel={handleCancel}
               onOk={handleOk}
             >
-              <Form form={form} labelCol={{ span: 24 }}>
+              <Form
+                form={form}
+                labelCol={{ span: 24 }}
+                onFinish={handleSubmitForm}
+              >
                 <FormItem
-                  label="Tên chủ xe"
-                  name="name"
+                  label="Tình trạng"
+                  name="description"
                   rules={[
                     {
                       required: true,
-                      message: "Tên chủ xe không được để trống",
+                      message: "Tình trạng xe không được để trống",
                     },
                   ]}
                 >
@@ -112,12 +143,28 @@ function Header() {
                   ]}
                 >
                   <Select
-                    options={[
-                      { value: "messiu", label: "MESSIU" },
-                      { value: "messiu1", label: "MESSIU1" },
-                    ]}
+                    placeholder="Chọn xe"
+                    options={cars.map((car) => ({
+                      label: `${car.brand} ${car.model} ${car.licensePlate}`,
+                      value: car._id,
+                    }))}
                   />
                 </FormItem>
+                <Form.Item label="Hình ảnh" name="image">
+                  <Upload
+                    listType="picture-card"
+                    fileList={fileList}
+                    onChange={handleChange}
+                    beforeUpload={() => false} // Ngăn auto-upload, xử lý sau
+                  >
+                    {fileList.length < 1 && (
+                      <div>
+                        <PlusOutlined />
+                        <div style={{ marginTop: 8 }}>Upload</div>
+                      </div>
+                    )}
+                  </Upload>
+                </Form.Item>
               </Form>
             </Modal>
             <ul
@@ -137,7 +184,10 @@ function Header() {
                 <Link to="/my-cars">Xe của bạn</Link>
               </li>
               <li>
-                <Link to="/combo-service">Lịch sử cứu hộ</Link>
+                <Link to="/history">Lịch sử cứu hộ</Link>
+              </li>
+              <li>
+                <Link to="/package">Gói dịch vụ</Link>
               </li>
             </ul>
           </>
