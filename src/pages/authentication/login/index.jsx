@@ -21,7 +21,12 @@ function Login() {
         // localStorage.setItem("token", res?.data?.result.accessToken);
         localStorage.setItem("token", res?.data?.access_token);
         dispatch(login(res?.data));
-        navigate("/");
+        if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
+          navigate("/admin/staff");
+        } else {
+          navigate("/");
+        }
+
         toast.success("Đăng nhập thành công");
       } else {
         toast.error(res.data.message);

@@ -15,6 +15,7 @@
     "antd": "^5.23.4",
     "axios": "^1.7.9",
     "firebase": "^11.3.1",
+    "moment-timezone": "^0.5.47",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",

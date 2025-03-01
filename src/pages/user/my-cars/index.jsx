@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "../../../redux/features/counterSlice";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
+import moment from "moment-timezone";
 
 function MyCars() {
   const [form] = useForm();
@@ -61,6 +62,13 @@ function MyCars() {
       title: "Gói hiện tại",
       dataIndex: "package",
       key: "package",
+      render: (value) => value?.name,
+    },
+    {
+      title: "Ngày hết hạn",
+      dataIndex: "expiredDate",
+      key: "expiredDate",
+      render: (value) => moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY"),
     },
     {
       title: "Thao tác",
@@ -117,8 +125,10 @@ function MyCars() {
   const fetchCarByUserId = async () => {
     try {
       const res = await api.get("/cars/my-cars");
+      console.log(res.data);
       if (!res.data.errorCode) {
         setDataSource(res.data);
+      } else {
       }
     } catch (error) {
       console.log(error);

@@ -50,9 +50,21 @@ function Header() {
   };
 
   const handleSubmitForm = async (value) => {
-    console.log(value);
-    const url = await uploadFile(value.image.fileList[0].originFileObj);
-    console.log(url);
+    try {
+      console.log(value);
+      const url = await uploadFile(value.image.fileList[0].originFileObj);
+      value.evidence = url;
+      const res = await api.post("/bookings", value);
+      console.log(res);
+      if (!res.data.errorCode) {
+        toast.success("Đặt cứu hộ thành công");
+        form.resetFields();
+        setIsModalOpen(false);
+        navigate("/history");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -134,7 +146,7 @@ function Header() {
                 </FormItem>
                 <FormItem
                   label="Xe"
-                  name="car"
+                  name="carId"
                   rules={[
                     {
                       required: true,

@@ -12,10 +12,26 @@ import History from "../pages/user/history";
 import Package from "../pages/user/package";
 import ForgotPassword from "../pages/authentication/forgot-password";
 import ResetPassword from "../pages/authentication/reset-password";
+import Checkout from "../pages/user/checkout";
+import AdminLayout from "../layout/admin";
+import StaffManagement from "../pages/admin/manage-staff";
+import BookingManagement from "../pages/admin/manage-booking";
+import UserManagement from "../pages/admin/manage-user";
+import ServiceManagement from "../pages/admin/manage-service";
+import PackageManagement from "../pages/admin/manage-package";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
   if (user?.role !== "CUSTOMER") {
+    toast.error("Bạn không có quyền thực hiện hành động này");
+    return <Navigate to={"/"} />;
+  }
+  return children;
+};
+
+export const ProtectedRouteAdmin = ({ children }) => {
+  const user = useSelector(selectUser);
+  if (user?.role !== "ADMIN" && user?.role !== "MANAGER") {
     toast.error("Bạn không có quyền thực hiện hành động này");
     return <Navigate to={"/"} />;
   }
@@ -67,6 +83,36 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    path: "/admin",
+    element: (
+      <ProtectedRouteAdmin>
+        <AdminLayout />
+      </ProtectedRouteAdmin>
+    ),
+    children: [
+      {
+        path: "/admin/staff",
+        element: <StaffManagement />,
+      },
+      {
+        path: "/admin/booking",
+        element: <BookingManagement />,
+      },
+      {
+        path: "/admin/user",
+        element: <UserManagement />,
+      },
+      {
+        path: "/admin/service",
+        element: <ServiceManagement />,
+      },
+      {
+        path: "/admin/package",
+        element: <PackageManagement />,
+      },
+    ],
+  },
+  {
     path: "login",
     element: <Login />,
   },
@@ -81,5 +127,9 @@ export const router = createBrowserRouter([
   {
     path: "reset-password",
     element: <ResetPassword />,
+  },
+  {
+    path: "checkout",
+    element: <Checkout />,
   },
 ]);
