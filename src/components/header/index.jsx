@@ -258,7 +258,12 @@ function Header() {
       ) : (
         <div className="header-right">
           <div style={{ fontSize: 20 }}>{user.fullName}</div>
-          <div style={{ fontSize: 20 }}>
+          <div
+            style={{ fontSize: 20 }}
+            onClick={() => {
+              navigate("/profile");
+            }}
+          >
             <UserOutlined />
           </div>
 

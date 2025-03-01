@@ -1,4 +1,13 @@
-import { Button, Form, Input, InputNumber, Modal, Select, Table } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Select,
+  Table,
+} from "antd";
 import { useForm } from "antd/es/form/Form";
 import FormItem from "antd/es/form/FormItem";
 import { useEffect, useState } from "react";
@@ -15,7 +24,6 @@ function MyCars() {
 
   const handleOk = () => {
     form.submit();
-    // setIsModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -56,17 +64,38 @@ function MyCars() {
     },
     {
       title: "Thao tác",
-      key: "id",
-      render: () => (
+      dataIndex: "_id",
+      key: "_id",
+      render: (id) => (
         <div style={{ display: "flex", gap: 10 }}>
           <Button type="primary">Thay đổi</Button>
-          <Button type="primary" danger>
-            Xóa
-          </Button>
+          <Popconfirm
+            title="Xóa"
+            description="Bạn có chắc là muốn xóa xe này không?"
+            onConfirm={() => handleDeleteCar(id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger>Xóa</Button>
+          </Popconfirm>
         </div>
       ),
     },
   ];
+
+  const handleDeleteCar = async (id) => {
+    console.log(id);
+    try {
+      const res = await api.delete(`/cars/${id}`);
+      if (!res.data.errorCode) {
+        const listCarAfterDelete = dataSource.filter((car) => car._id != id);
+        setDataSource(listCarAfterDelete);
+        toast.success("Xóa xe thành công");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   const handleSubmitForm = async (value) => {
     try {

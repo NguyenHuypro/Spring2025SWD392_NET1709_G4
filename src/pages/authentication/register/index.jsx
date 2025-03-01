@@ -116,7 +116,7 @@ function Register() {
               form.submit();
             }}
           >
-            Signup
+            Đăng kí
           </Button>
           <div className="signup">
             <span className="signup">

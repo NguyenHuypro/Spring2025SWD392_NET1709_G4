@@ -1,13 +1,7 @@
 import { Button, Table } from "antd";
+import { changeCurr } from "../../../utils/utils";
 
 function History() {
-  function changeCurr(value = 200000) {
-    const formattedCurr = new Intl.NumberFormat("vi-VI", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
-    return formattedCurr;
-  }
   //   const price = changeCurr(10000);
   const columns = [
     {

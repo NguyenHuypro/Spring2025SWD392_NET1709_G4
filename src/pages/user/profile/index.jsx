@@ -2,16 +2,31 @@ import { Button, Col, Form, Input } from "antd";
 import "./index.scss";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import { useForm } from "antd/es/form/Form";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../../redux/features/counterSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { login, selectUser } from "../../../redux/features/counterSlice";
 import { useEffect, useState } from "react";
+import api from "../../../configs/axios";
+import { toast } from "react-toastify";
 function Profile() {
   const [form] = useForm();
   const user = useSelector(selectUser);
   const [isDisabled, setIsDisabled] = useState(true);
+  const dispatch = useDispatch();
 
   const handleSubmitForm = async (value) => {
     console.log(value);
+    try {
+      const res = await api.put("/users", value);
+      if (!res.data.errorCode) {
+        dispatch(login(res?.data));
+        toast.success("Chỉnh sửa thành công");
+        setIsDisabled(true);
+      } else {
+        toast.error("Chỉnh sửa thất bại");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -35,25 +50,12 @@ function Profile() {
       </div>
 
       <Form labelCol={{ span: 24 }} form={form} onFinish={handleSubmitForm}>
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            {
-              required: true,
-              message: "Please input your email",
-            },
-            {
-              type: "email",
-              message: "Please input a valid email",
-            },
-          ]}
-        >
-          <Input defaultValue={user.email} disabled={isDisabled} />
+        <Form.Item label="Email" name="email">
+          <Input defaultValue={user.email} disabled />
         </Form.Item>
         <Form.Item
           label="Fullname"
-          name="fullname"
+          name="fullName"
           rules={[
             {
               required: true,
