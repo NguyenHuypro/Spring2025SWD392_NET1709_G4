@@ -19,10 +19,21 @@ function Login() {
       console.log(res.data);
       if (!res.data.errorCode) {
         // localStorage.setItem("token", res?.data?.result.accessToken);
-        localStorage.setItem("token", res?.data?.access_token);
-        dispatch(login(res?.data));
+        // localStorage.setItem("token", res?.data?.access_token);
+        // dispatch(login(res?.data));
+        // if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
+        //   navigate("/admin/staff");
+        // } else if (res.data.role === "RESCUER") {
+        //   navigate("/rescuer");
+        // } else {
+        //   navigate("/");
+        // }
+        // localStorage.setItem("token", res?.data?.result.accessToken);
+        dispatch(login(res?.data?.result));
         if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
           navigate("/admin/staff");
+        } else if (res.data.role === "RESCUER") {
+          navigate("/rescuer");
         } else {
           navigate("/");
         }

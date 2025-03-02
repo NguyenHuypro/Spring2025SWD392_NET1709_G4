@@ -51,16 +51,16 @@ function Header() {
 
   const handleSubmitForm = async (value) => {
     try {
-      console.log(value);
       const url = await uploadFile(value.image.fileList[0].originFileObj);
       value.evidence = url;
       const res = await api.post("/bookings", value);
-      console.log(res);
       if (!res.data.errorCode) {
         toast.success("Đặt cứu hộ thành công");
         form.resetFields();
         setIsModalOpen(false);
         navigate("/history");
+      } else {
+        toast.error(res.data.message);
       }
     } catch (error) {
       toast.error(error.message);

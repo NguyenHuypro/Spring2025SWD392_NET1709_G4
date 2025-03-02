@@ -1,19 +1,29 @@
 import { Button, Table } from "antd";
 import { changeCurr } from "../../../utils/utils";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../../redux/features/counterSlice";
+import { useEffect, useState } from "react";
+import api from "../../../configs/axios";
+import { toast } from "react-toastify";
+import moment from "moment-timezone";
 
 function History() {
-  //   const price = changeCurr(10000);
+  const [dataSource, setDataSource] = useState([]);
   const columns = [
     {
       title: "Thời điểm đặt lịch",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "bookingDate",
+      key: "bookingDate",
+      render: (value) =>
+        moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY HH:MM:ss"),
     },
 
     {
       title: "Thời điểm kết thúc",
-      dataIndex: "completedAt",
-      key: "completedAt",
+      dataIndex: "completedDate",
+      key: "completedDate",
+      render: (value) =>
+        moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY HH:MM:ss"),
     },
     {
       title: "Tình trạng",
@@ -21,9 +31,15 @@ function History() {
       key: "description",
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
       title: "Tổng tiền",
-      dataIndex: "price",
-      key: "price",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      render: (value) => changeCurr(value),
     },
     {
       title: "Biển số xe",
@@ -32,29 +48,56 @@ function History() {
     },
     {
       title: "Thao tác",
-      key: "id",
-      render: () => (
+      render: (value, record) => (
         <div style={{ display: "flex", gap: 10 }}>
           <Button type="primary">Xem chi tiết</Button>
+          {record?.status === "PENDING_PAYMENT" && (
+            <Button
+              type="primary"
+              onClick={() => {
+                handleClickPayment(record._id, record.totalPrice);
+              }}
+            >
+              Thanh toán
+            </Button>
+          )}
         </div>
       ),
     },
   ];
+
+  const fetchBookingsByUserId = async () => {
+    try {
+      const res = await api.get(`/bookings/user`);
+      if (!res.data.errorCode) {
+        setDataSource(res.data);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleClickPayment = async (id, totalPrice) => {
+    console.log(id, totalPrice);
+    try {
+      const res = await api.post("/payment/booking", { bookingId: id });
+      if (!res.data.errorCode) {
+        window.open(res.data.paymentUrl, "_blank");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  useEffect(() => {
+    fetchBookingsByUserId();
+  }, []);
   return (
     <div>
-      <Table
-        dataSource={[
-          {
-            createdAt: "15-02-2025",
-            completedAt: "15-02-2025",
-            description: "Xe bị bể bánh",
-            numberOfSeats: 5,
-            price: changeCurr(500000),
-            licensePlate: "51L-12345",
-          },
-        ]}
-        columns={columns}
-      />
+      <Table dataSource={dataSource} columns={columns} />
     </div>
   );
 }

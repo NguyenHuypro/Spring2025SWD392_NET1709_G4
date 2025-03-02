@@ -74,7 +74,7 @@ export default function StaffManagement() {
       const res = await api.post("/auth/admin/register", value);
       console.log(res);
       if (!res.data.errorCode) {
-        setDataSource([...dataSource, res.data]);
+        setDataSource([res.data, ...dataSource]);
         form.resetFields();
         toast.success("Tạo nhân viên mới thành công");
       } else {
