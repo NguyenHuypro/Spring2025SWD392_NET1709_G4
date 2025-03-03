@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { changeCurr } from "../../utils/utils";
 const { Content, Footer, Sider } = Layout;
 
-const RescuerLayout = () => {
+const StaffLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const [dataSource, setDataSource] = useState([]);
@@ -28,12 +28,12 @@ const RescuerLayout = () => {
   ];
 
   useEffect(() => {
-    fetchBookingsByRescuerId();
+    fetchBookingsByStaffId();
   }, []);
 
-  const fetchBookingsByRescuerId = async () => {
+  const fetchBookingsByStaffId = async () => {
     try {
-      const res = await api.get(`/bookings/rescuer/${user._id}`);
+      const res = await api.get(`/bookings/staff/${user._id}`);
       if (!res.data.errorCode) {
         setDataSource(res.data);
       }
@@ -49,7 +49,7 @@ const RescuerLayout = () => {
       });
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
-        fetchBookingsByRescuerId();
+        fetchBookingsByStaffId();
       } else {
         toast.error("Có lỗi xảy ra");
       }
@@ -218,7 +218,7 @@ const RescuerLayout = () => {
       });
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
-        fetchBookingsByRescuerId();
+        fetchBookingsByStaffId();
         setIsModalOpen(false);
       } else {
         toast.error("Có lỗi xảy ra");
@@ -274,4 +274,4 @@ const RescuerLayout = () => {
   );
 };
 
-export default RescuerLayout;
+export default StaffLayout;

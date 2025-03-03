@@ -19,7 +19,7 @@ import BookingManagement from "../pages/admin/manage-booking";
 import UserManagement from "../pages/admin/manage-user";
 import ServiceManagement from "../pages/admin/manage-service";
 import PackageManagement from "../pages/admin/manage-package";
-import RescuerLayout from "../layout/rescuer";
+import StaffLayout from "../layout/staff";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -39,9 +39,9 @@ export const ProtectedRouteAdmin = ({ children }) => {
   return children;
 };
 
-export const ProtectedRouteRescuer = ({ children }) => {
+export const ProtectedRouteStaff = ({ children }) => {
   const user = useSelector(selectUser);
-  if (user?.role !== "RESCUER") {
+  if (user?.role !== "STAFF") {
     toast.error("Bạn không có quyền thực hiện hành động này");
     return <Navigate to={"/"} />;
   }
@@ -123,11 +123,11 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/rescuer",
+    path: "/staff",
     element: (
-      <ProtectedRouteRescuer>
-        <RescuerLayout />
-      </ProtectedRouteRescuer>
+      <ProtectedRouteStaff>
+        <StaffLayout />
+      </ProtectedRouteStaff>
     ),
   },
   {

@@ -175,7 +175,7 @@ export default function StaffManagement() {
             >
               <Select
                 options={[
-                  { label: "Nhân viên cứu hộ", value: "RESCUER" },
+                  { label: "Nhân viên cứu hộ", value: "STAFF" },
                   { label: "Lê tân", value: "RECEPTIONIST" },
                 ]}
               />

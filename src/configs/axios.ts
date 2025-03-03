@@ -1,7 +1,7 @@
 import axios from "axios";
-const baseURL =
-  "https://carrescuesystem-d0gbgkg5eef0g5dr.southeastasia-01.azurewebsites.net/api";
-// const baseURL = "http://localhost:3000/api";
+// const baseURL =
+//   "https://carrescuesystem-d0gbgkg5eef0g5dr.southeastasia-01.azurewebsites.net/api";
+const baseURL = "http://localhost:3000/api";
 const config = {
   baseURL,
   timeout: 3000000,

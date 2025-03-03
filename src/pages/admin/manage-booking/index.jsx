@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 
 export default function BookingManagement() {
   const [dataSource, setDataSource] = useState([]);
-  const [rescuers, setRescuers] = useState([]);
-  const [selectedRescuers, setSelectedRescuers] = useState([]);
+  const [staffs, setStaffs] = useState([]);
+  const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
@@ -25,11 +25,11 @@ export default function BookingManagement() {
     }
   };
 
-  const fetchAvailableRescuers = async () => {
+  const fetchAvailableStaffs = async () => {
     try {
-      const res = await api.get("/users/available-rescuers");
+      const res = await api.get("/users/available-staffs");
       if (!res.data.errorCode) {
-        setRescuers(res.data);
+        setStaffs(res.data);
         setIsModalOpen(true); // Mở modal sau khi lấy dữ liệu
       }
     } catch (error) {
@@ -39,25 +39,25 @@ export default function BookingManagement() {
 
   const handleAssignClick = (booking) => {
     setSelectedBooking(booking);
-    fetchAvailableRescuers();
+    fetchAvailableStaffs();
   };
 
-  const handleAssignRescuers = async () => {
-    if (selectedRescuers.length !== 2) {
+  const handleAssignStaffs = async () => {
+    if (selectedStaffs.length !== 2) {
       toast.error("Bạn phải chọn đúng 2 nhân viên cứu hộ!");
       return;
     }
 
     try {
       await api.put(`/bookings/${selectedBooking._id}/assign`, {
-        staff1: selectedRescuers[0],
-        staff2: selectedRescuers[1],
+        staff1: selectedStaffs[0],
+        staff2: selectedStaffs[1],
       });
 
       toast.success("Phân công nhân viên cứu hộ thành công!");
       fetchBookings();
       setIsModalOpen(false);
-      setSelectedRescuers([]);
+      setSelectedStaffs([]);
     } catch (error) {
       toast.error(error.message);
     }
@@ -155,9 +155,9 @@ export default function BookingManagement() {
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
-          setSelectedRescuers([]);
+          setSelectedStaffs([]);
         }}
-        onOk={handleAssignRescuers}
+        onOk={handleAssignStaffs}
         okText="Xác nhận"
         cancelText="Hủy"
       >
@@ -166,13 +166,13 @@ export default function BookingManagement() {
           mode="multiple"
           style={{ width: "100%" }}
           placeholder="Chọn nhân viên cứu hộ"
-          value={selectedRescuers}
-          onChange={setSelectedRescuers}
+          value={selectedStaffs}
+          onChange={setSelectedStaffs}
           maxTagCount={2}
         >
-          {rescuers.map((rescuer) => (
-            <Select.Option key={rescuer._id} value={rescuer._id}>
-              {rescuer.fullName}
+          {staffs.map((staff) => (
+            <Select.Option key={staff._id} value={staff._id}>
+              {staff.fullName}
             </Select.Option>
           ))}
         </Select>
