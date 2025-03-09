@@ -24,8 +24,8 @@ export default function UserManagement() {
     },
     {
       title: "Thao tác",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
       render: (id) => (
         <div style={{ display: "flex", gap: 10 }}>
           <Button type="primary">Thay đổi</Button>
@@ -47,7 +47,7 @@ export default function UserManagement() {
     try {
       const res = await api.get("/users/customers");
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);

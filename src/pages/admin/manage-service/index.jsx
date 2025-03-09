@@ -19,7 +19,6 @@ import { changeCurr } from "../../../utils/utils";
 export default function PackageManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
-  const [services, setServices] = useState([]);
 
   useEffect(() => {
     fetchServices();
@@ -29,7 +28,7 @@ export default function PackageManagement() {
     try {
       const res = await api.get("/services"); // Gọi API lấy danh sách dịch vụ
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
@@ -40,7 +39,7 @@ export default function PackageManagement() {
     try {
       const res = await api.post("/services", values);
       if (!res.data.errorCode) {
-        setDataSource([res.data, ...dataSource]);
+        setDataSource([res.data.result, ...dataSource]);
         form.resetFields();
         toast.success("Tạo dịch vụ mới thành công");
       } else {
@@ -57,7 +56,7 @@ export default function PackageManagement() {
       const res = await api.delete(`/services/${id}`);
       if (!res.data.errorCode) {
         const listServicesAfterDelete = dataSource.filter(
-          (service) => service._id != id
+          (service) => service.id != id
         );
         setDataSource(listServicesAfterDelete);
         toast.success("Xóa dịch vụ thành công");
@@ -81,8 +80,8 @@ export default function PackageManagement() {
     },
     {
       title: "Thao tác",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
       render: (id) => (
         <>
           <Button type="primary">Chỉnh sửa</Button>
@@ -120,18 +119,18 @@ export default function PackageManagement() {
             <Form.Item
               label="Tên"
               name="name"
-              rules={[{ required: true, message: "Please input package name" }]}
+              rules={[{ required: true, message: "Bắt buộc nhập tên" }]}
             >
-              <Input placeholder="Enter service name" />
+              <Input placeholder="Nhập tên" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               label="Giá"
               name="price"
-              rules={[{ required: true, message: "Please input price" }]}
+              rules={[{ required: true, message: "Bắt buộc nhập giá" }]}
             >
-              <Input type="number" placeholder="Enter price" />
+              <Input type="number" placeholder="Nhập giá" />
             </Form.Item>
           </Col>
         </Row>

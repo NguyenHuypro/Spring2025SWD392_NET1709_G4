@@ -78,7 +78,7 @@ export default function Package() {
     try {
       const res = await api.get("/packages");
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
@@ -89,7 +89,7 @@ export default function Package() {
     try {
       const res = await api.get("/cars/my-cars");
       if (!res.data.errorCode) {
-        setCars(res.data);
+        setCars(res.data.result);
       }
     } catch (error) {
       toast.error("Lỗi khi tải danh sách xe.");
@@ -112,7 +112,7 @@ export default function Package() {
       return;
     }
 
-    navigate(`/checkout?packageId=${currentPackage._id}&car=${selectedCar}`);
+    navigate(`/checkout?packageId=${currentPackage.id}&car=${selectedCar}`);
   };
 
   useEffect(() => {
@@ -143,8 +143,8 @@ export default function Package() {
         <Radio.Group onChange={handleCarChange} value={selectedCar}>
           {cars.map((car) => (
             <Radio
-              key={car._id}
-              value={car._id}
+              key={car.id}
+              value={car.id}
               style={{ display: "block", marginBottom: "10px" }}
             >
               {car.brand} {car.model} ({car.licensePlate})

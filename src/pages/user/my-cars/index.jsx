@@ -1,18 +1,7 @@
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Popconfirm,
-  Select,
-  Table,
-} from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Select, Table } from "antd";
 import { useForm } from "antd/es/form/Form";
 import FormItem from "antd/es/form/FormItem";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../../redux/features/counterSlice";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
@@ -21,7 +10,9 @@ function MyCars() {
   const [form] = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataSource, setDataSource] = useState([]);
-  const user = useSelector(selectUser);
+  const [isModal2Open, setIsModal2Open] = useState(false);
+  const [color, setColor] = useState("");
+  const [selectedCar, setSelectedCar] = useState();
 
   const handleOk = () => {
     form.submit();
@@ -62,21 +53,37 @@ function MyCars() {
       title: "Gói hiện tại",
       dataIndex: "package",
       key: "package",
-      render: (value) => value?.name,
+      render: (value) => {
+        if (value?.name) return value?.name;
+        return "Chưa mua gói";
+      },
     },
     {
       title: "Ngày hết hạn",
       dataIndex: "expiredDate",
       key: "expiredDate",
-      render: (value) => moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY"),
+      render: (value) => {
+        if (value) {
+          return moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY");
+        }
+        return;
+      },
     },
     {
       title: "Thao tác",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
       render: (id) => (
         <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Thay đổi</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              setSelectedCar(id);
+              setIsModal2Open(true);
+            }}
+          >
+            Thay đổi
+          </Button>
           <Popconfirm
             title="Xóa"
             description="Bạn có chắc là muốn xóa xe này không?"
@@ -96,7 +103,7 @@ function MyCars() {
     try {
       const res = await api.delete(`/cars/${id}`);
       if (!res.data.errorCode) {
-        const listCarAfterDelete = dataSource.filter((car) => car._id != id);
+        const listCarAfterDelete = dataSource.filter((car) => car.id != id);
         setDataSource(listCarAfterDelete);
         toast.success("Xóa xe thành công");
       }
@@ -110,7 +117,7 @@ function MyCars() {
       const res = await api.post("/cars", value);
       console.log(res);
       if (!res.data.errorCode) {
-        setDataSource([...dataSource, res.data]);
+        setDataSource([...dataSource, res.data.result]);
         form.resetFields();
         setIsModalOpen(false);
         toast.success("Tạo xe mới thành công");
@@ -122,13 +129,31 @@ function MyCars() {
     }
   };
 
+  const handleChangeColor = async () => {
+    try {
+      const res = await api.put(`/cars/${selectedCar}`, { color });
+      if (!res.data.errorCode) {
+        setDataSource([...dataSource, res.data.result]);
+        setColor("");
+        setSelectedCar("");
+        await fetchCarByUserId();
+        setIsModal2Open(false);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const fetchCarByUserId = async () => {
     try {
       const res = await api.get("/cars/my-cars");
-      console.log(res.data);
+      console.log(res.data.result);
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       } else {
+        toast.error(res.data.message);
       }
     } catch (error) {
       console.log(error);
@@ -233,6 +258,20 @@ function MyCars() {
             <Input />
           </FormItem>
         </Form>
+      </Modal>
+      <Modal
+        title="Thay đổi màu xe"
+        open={isModal2Open}
+        onCancel={() => {
+          setIsModal2Open(false);
+        }}
+        onOk={handleChangeColor}
+      >
+        <Input
+          onChange={(e) => {
+            setColor(e.target.value);
+          }}
+        />
       </Modal>
     </div>
   );

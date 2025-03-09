@@ -42,7 +42,7 @@ function Header() {
     try {
       const res = await api.get("/cars/my-cars");
       if (!res.data.errorCode) {
-        setCars(res.data);
+        setCars(res.data.result);
       }
     } catch (error) {
       console.log(error);
@@ -158,7 +158,7 @@ function Header() {
                     placeholder="Chọn xe"
                     options={cars.map((car) => ({
                       label: `${car.brand} ${car.model} ${car.licensePlate}`,
-                      value: car._id,
+                      value: car.id,
                     }))}
                   />
                 </FormItem>

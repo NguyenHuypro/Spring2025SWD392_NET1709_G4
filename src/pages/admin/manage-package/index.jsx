@@ -1,15 +1,5 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Row,
-  Select,
-  Table,
-  Checkbox,
-} from "antd";
-import { useState, useEffect } from "react";
+import { Button, Col, Form, Input, Modal, Row, Table, Checkbox } from "antd";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
@@ -23,75 +13,58 @@ export default function PackageManagement() {
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [services, setServices] = useState([]); // Danh sách dịch vụ
   const [selectedServices, setSelectedServices] = useState([]); // Dịch vụ được chọn
-  const [selectedServiceNames, setSelectedServiceNames] = useState([]); // Tên dịch vụ được chọn
-
-  useEffect(() => {
-    fetchPackages();
-    fetchServices();
-  }, []);
 
   const fetchPackages = async () => {
     try {
       const res = await api.get("/packages");
+      console.log(res.data.result);
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     try {
-      const res = await api.get("/services"); // Gọi API lấy danh sách dịch vụ
+      const res = await api.get("/services");
       if (!res.data.errorCode) {
-        setServices(res.data);
+        setServices(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, []);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleCloseServiceModal = () => {
-    setIsServiceModalOpen(false);
-    setSelectedServices([]);
-    setSelectedServiceNames([]);
-  };
+  const handleCloseServiceModal = () => setIsServiceModalOpen(false);
 
-  const handleSelectService = () => {
+  const handleSelectService = async () => {
+    if (services.length === 0) await fetchServices();
     setIsServiceModalOpen(true);
   };
 
   const handleConfirmServices = () => {
-    const selectedNames = services
-      .filter((service) => selectedServices.includes(service._id))
-      .map((service) => service.name);
-
-    setSelectedServiceNames(selectedNames); // Lưu tên dịch vụ
-    form.setFieldsValue({ services: selectedServices }); // Cập nhật vào form
     setIsServiceModalOpen(false);
+    form.setFieldsValue({ services: selectedServices });
   };
 
-  const handleServiceCheckboxChange = (serviceId) => {
+  const handleServiceCheckboxChange = useCallback((serviceId, checked) => {
     setSelectedServices((prev) =>
-      prev.includes(serviceId)
-        ? prev.filter((id) => id !== serviceId)
-        : [...prev, serviceId]
+      checked ? [...prev, serviceId] : prev.filter((id) => id !== serviceId)
     );
-  };
+  }, []);
 
   const handleSubmitForm = async (values) => {
     try {
       console.log(values);
       const res = await api.post("/packages", values);
       if (!res.data.errorCode) {
-        setDataSource([res.data, ...dataSource]);
+        setDataSource([res.data.result, ...dataSource]);
         form.resetFields();
-        setSelectedServiceNames([]);
+        setSelectedServices([]);
         toast.success("Tạo gói dịch vụ mới thành công");
       } else {
         toast.error(res.data.message);
@@ -101,17 +74,25 @@ export default function PackageManagement() {
     }
   };
 
+  const selectedServiceNames = useMemo(() => {
+    return services
+      .filter((service) => selectedServices.includes(service.id))
+      .map((service) => service.name);
+  }, [selectedServices, services]);
+
+  const renderCheckbox = useCallback(
+    (id) => (
+      <Checkbox
+        checked={selectedServices.includes(id)}
+        onChange={(e) => handleServiceCheckboxChange(id, e.target.checked)}
+      />
+    ),
+    [selectedServices, handleServiceCheckboxChange]
+  );
+
   const columns = [
-    {
-      title: "Tên",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Mô tả",
-      dataIndex: "description",
-      key: "description",
-    },
+    { title: "Tên", dataIndex: "name", key: "name" },
+    { title: "Mô tả", dataIndex: "description", key: "description" },
     {
       title: "Giá",
       dataIndex: "price",
@@ -139,35 +120,7 @@ export default function PackageManagement() {
   ];
 
   const serviceColumns = [
-    {
-      title: "Tên dịch vụ",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => changeCurr(price),
-    },
-  ];
-  const serviceColumns2 = [
-    {
-      title: "Chọn",
-      dataIndex: "_id",
-      key: "_id",
-      render: (id) => (
-        <Checkbox
-          checked={selectedServices.includes(id)}
-          onChange={() => handleServiceCheckboxChange(id)}
-        />
-      ),
-    },
-    {
-      title: "Tên dịch vụ",
-      dataIndex: "name",
-      key: "name",
-    },
+    { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
     {
       title: "Giá",
       dataIndex: "price",
@@ -176,6 +129,19 @@ export default function PackageManagement() {
     },
   ];
 
+  const serviceColumns2 = [
+    { title: "Chọn", dataIndex: "id", key: "id", render: renderCheckbox },
+    { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => changeCurr(price),
+    },
+  ];
+  useEffect(() => {
+    fetchPackages();
+  }, []);
   return (
     <>
       <Form
@@ -196,18 +162,18 @@ export default function PackageManagement() {
             <Form.Item
               label="Tên"
               name="name"
-              rules={[{ required: true, message: "Please input package name" }]}
+              rules={[{ required: true, message: "Bắt buộc nhập tên gói" }]}
             >
-              <Input placeholder="Enter package name" />
+              <Input placeholder="Nhập tên gói" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               label="Mô tả"
               name="description"
-              rules={[{ required: true, message: "Please input description" }]}
+              rules={[{ required: true, message: "Bắt buộc nhập mô tả" }]}
             >
-              <Input placeholder="Enter description" />
+              <Input placeholder="Nhập mô tả" />
             </Form.Item>
           </Col>
         </Row>
@@ -217,9 +183,9 @@ export default function PackageManagement() {
             <Form.Item
               label="Giá"
               name="price"
-              rules={[{ required: true, message: "Please input price" }]}
+              rules={[{ required: true, message: "Bắt buộc nhập giá" }]}
             >
-              <Input type="number" placeholder="Enter price" />
+              <Input type="number" placeholder="Nhập giá" />
             </Form.Item>
           </Col>
 
@@ -258,7 +224,6 @@ export default function PackageManagement() {
         />
       </Modal>
 
-      {/* Modal chọn dịch vụ */}
       <Modal
         open={isServiceModalOpen}
         onCancel={handleCloseServiceModal}
@@ -269,7 +234,7 @@ export default function PackageManagement() {
           dataSource={services}
           columns={serviceColumns2}
           pagination={false}
-          rowKey="_id"
+          rowKey="id"
         />
       </Modal>
 

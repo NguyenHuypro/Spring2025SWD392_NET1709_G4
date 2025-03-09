@@ -20,6 +20,7 @@ import UserManagement from "../pages/admin/manage-user";
 import ServiceManagement from "../pages/admin/manage-service";
 import PackageManagement from "../pages/admin/manage-package";
 import StaffLayout from "../layout/staff";
+import Detail from "../pages/user/detail";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -79,6 +80,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRouteUser>
             <History />
+          </ProtectedRouteUser>
+        ),
+      },
+      {
+        path: "/history/:id",
+        element: (
+          <ProtectedRouteUser>
+            <Detail />
           </ProtectedRouteUser>
         ),
       },

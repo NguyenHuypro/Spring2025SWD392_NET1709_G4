@@ -14,8 +14,8 @@ function Register() {
       const res = await api.post("/auth/register", value);
       console.log(res);
       if (!res.data.errorCode) {
-        toast.success("Đăng kí thành công");
-        navigate("/login");
+        toast.success(res.data.message);
+        // navigate("/login");
       } else {
         toast.error(res.data.message);
       }
@@ -36,51 +36,51 @@ function Register() {
               rules={[
                 {
                   required: true,
-                  message: "Please input your email",
+                  message: "Nhập email của bạn",
                 },
                 {
                   type: "email",
-                  message: "Please input a valid email",
+                  message: "Nhập email hợp lệ",
                 },
               ]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="Fullname"
+              label="Họ và tên"
               name="fullName"
               rules={[
                 {
                   required: true,
-                  message: "Please input your fullname",
+                  message: "Nhập họ và tên của bạn",
                 },
               ]}
             >
-              <Input type="email" />
+              <Input />
             </Form.Item>
             <Form.Item
-              label="Phone"
+              label="Số điện thoại"
               name="phone"
               rules={[
                 {
                   required: true,
-                  message: "Please input your your phone number",
+                  message: "Nhập số điện thoại của bạn",
                 },
                 {
                   len: 10,
-                  message: "A valid phone number contains 10 digits",
+                  message: "Số điện thoại bao gồm 10 số",
                 },
               ]}
             >
               <Input type="number" maxLength={10} />
             </Form.Item>
             <Form.Item
-              label="Password"
+              label="Mật khẩu"
               name="password"
               rules={[
                 {
                   required: true,
-                  message: "Please input your password",
+                  message: "Nhập mật khẩu",
                 },
               ]}
             >
@@ -88,20 +88,20 @@ function Register() {
             </Form.Item>
 
             <Form.Item
-              label="Confirm Password"
+              label="Xác nhận mật khẩu"
               name="passwordConfirmed"
               dependencies={["password"]}
               rules={[
                 {
                   required: true,
-                  message: "Please confirm your password",
+                  message: "Xác nhận mật khẩu",
                 },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue("password") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error("Passwords do not match!"));
+                    return Promise.reject(new Error("Mật khẩu không khớp"));
                   },
                 }),
               ]}

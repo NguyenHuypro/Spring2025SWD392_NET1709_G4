@@ -22,7 +22,7 @@ export default function Checkout() {
       if (!packageId) return;
       const res = await api.get(`/packages/${packageId}`);
       if (!res.data.errorCode) {
-        setPackageDetails(res.data);
+        setPackageDetails(res.data.result);
       } else {
         toast.error("Không tìm thấy gói dịch vụ.");
       }
@@ -36,7 +36,7 @@ export default function Checkout() {
       if (!selectedCarId) return;
       const res = await api.get(`/cars/my-cars`);
       if (!res.data.errorCode) {
-        const car = res.data.find((c) => c._id === selectedCarId);
+        const car = res.data.result.find((c) => c.id === selectedCarId);
         setSelectedCar(car || null);
       }
     } catch (error) {
@@ -58,13 +58,14 @@ export default function Checkout() {
     try {
       const paymentData = {
         packageId,
-        carId: selectedCar._id, // Chỉ truyền 1 xe
+        carId: selectedCar.id, // Chỉ truyền 1 xe
       };
 
       const res = await api.post("/payment", paymentData);
+      console.log(res.data);
 
-      if (!res.data.errorCode && res.data.paymentUrl) {
-        window.open(res.data.paymentUrl, "_blank");
+      if (!res.data.errorCode && res.data.result) {
+        window.open(res.data.result, "_blank");
       } else {
         toast.error("Có lỗi xảy ra");
       }

@@ -18,7 +18,7 @@ export default function BookingManagement() {
     try {
       const res = await api.get("/bookings");
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
@@ -29,7 +29,7 @@ export default function BookingManagement() {
     try {
       const res = await api.get("/users/available-staffs");
       if (!res.data.errorCode) {
-        setStaffs(res.data);
+        setStaffs(res.data.result);
         setIsModalOpen(true); // Mở modal sau khi lấy dữ liệu
       }
     } catch (error) {
@@ -49,7 +49,7 @@ export default function BookingManagement() {
     }
 
     try {
-      await api.put(`/bookings/${selectedBooking._id}/assign`, {
+      await api.put(`/bookings/${selectedBooking.id}/assign`, {
         staff1: selectedStaffs[0],
         staff2: selectedStaffs[1],
       });
@@ -130,6 +130,13 @@ export default function BookingManagement() {
                 description="Bạn có chắc là muốn từ chối booking này không?"
                 okText="Yes"
                 cancelText="No"
+                onConfirm={async () => {
+                  const res = await api.put(`/bookings/${record.id}/status`, {
+                    status: "CANCELLED",
+                  });
+                  console.log(res.data);
+                  fetchBookings();
+                }}
               >
                 <Button danger>Từ chối</Button>
               </Popconfirm>
@@ -171,7 +178,7 @@ export default function BookingManagement() {
           maxTagCount={2}
         >
           {staffs.map((staff) => (
-            <Select.Option key={staff._id} value={staff._id}>
+            <Select.Option key={staff.id} value={staff.id}>
               {staff.fullName}
             </Select.Option>
           ))}

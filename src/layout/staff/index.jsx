@@ -33,9 +33,9 @@ const StaffLayout = () => {
 
   const fetchBookingsByStaffId = async () => {
     try {
-      const res = await api.get(`/bookings/staff/${user._id}`);
+      const res = await api.get(`/bookings/staff/${user.id}`);
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error("Lỗi khi tải danh sách nhiệm vụ!");
@@ -47,6 +47,7 @@ const StaffLayout = () => {
       const res = await api.put(`/bookings/${bookingId}/status`, {
         status: newStatus,
       });
+      console.log(res.data);
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
@@ -63,7 +64,7 @@ const StaffLayout = () => {
     try {
       const res = await api.get("/services");
       if (!res.data.errorCode) {
-        setServices(res.data);
+        setServices(res.data.result);
       } else {
         toast.error(res.data.message);
       }
@@ -141,7 +142,7 @@ const StaffLayout = () => {
           <Button type="primary">Chi tiết</Button>
           {value.status === "COMING" && (
             <Button
-              onClick={() => updateBookingStatus(record._id, "IN-PROGRESS")}
+              onClick={() => updateBookingStatus(record.id, "IN-PROGRESS")}
             >
               Đã đến nơi
             </Button>
@@ -149,7 +150,7 @@ const StaffLayout = () => {
           {value.status === "IN-PROGRESS" && (
             <Button
               onClick={() => {
-                handleClickFinish(record._id);
+                handleClickFinish(record.id);
               }}
               type="primary"
             >
@@ -163,7 +164,7 @@ const StaffLayout = () => {
 
   const handleCheckboxChange = (checked, serviceId) => {
     const selectedService = services.find(
-      (service) => service._id === serviceId
+      (service) => service.id === serviceId
     );
 
     if (checked) {
@@ -179,8 +180,8 @@ const StaffLayout = () => {
   const serviceColumns = [
     {
       title: "Chọn",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
       render: (value) => (
         <Checkbox
           checked={selectedServices.includes(value)}
@@ -216,6 +217,7 @@ const StaffLayout = () => {
         totalPrice,
         services: selectedServices,
       });
+      console.log(res);
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();

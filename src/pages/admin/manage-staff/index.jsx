@@ -1,8 +1,7 @@
 import { Button, Col, Form, Input, Popconfirm, Row, Select, Table } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
-import FormItem from "antd/es/form/FormItem";
 import { useForm } from "antd/es/form/Form";
 
 import {
@@ -38,8 +37,8 @@ export default function StaffManagement() {
     },
     {
       title: "Thao tác",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
       render: (id) => (
         <div style={{ display: "flex", gap: 10 }}>
           <Button type="primary">Thay đổi</Button>
@@ -61,7 +60,7 @@ export default function StaffManagement() {
     try {
       const res = await api.get("/users/staffs");
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
@@ -74,7 +73,7 @@ export default function StaffManagement() {
       const res = await api.post("/auth/admin/register", value);
       console.log(res);
       if (!res.data.errorCode) {
-        setDataSource([res.data, ...dataSource]);
+        setDataSource([res.data.result, ...dataSource]);
         form.resetFields();
         toast.success("Tạo nhân viên mới thành công");
       } else {
@@ -122,27 +121,22 @@ export default function StaffManagement() {
               label="Email"
               name="email"
               rules={[
-                { required: true, message: "Please input your email" },
-                { type: "email", message: "Please input a valid email" },
+                { required: true, message: "Nhập email" },
+                { type: "email", message: "Nhập email hợp lệ" },
               ]}
             >
-              <Input prefix={<MailOutlined />} placeholder="Enter your email" />
+              <Input prefix={<MailOutlined />} placeholder="Nhập email" />
             </Form.Item>
           </Col>
 
           {/* Full Name */}
           <Col span={12}>
             <Form.Item
-              label="Full Name"
+              label="Họ và tên"
               name="fullName"
-              rules={[
-                { required: true, message: "Please input your full name" },
-              ]}
+              rules={[{ required: true, message: "Nhập họ và tên" }]}
             >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Enter your full name"
-              />
+              <Input prefix={<UserOutlined />} placeholder="Nhập họ và tên" />
             </Form.Item>
           </Col>
         </Row>
@@ -151,17 +145,17 @@ export default function StaffManagement() {
           {/* Phone */}
           <Col span={12}>
             <Form.Item
-              label="Phone Number"
+              label="Số điện thoại"
               name="phone"
               rules={[
-                { required: true, message: "Please input your phone number" },
-                { len: 10, message: "A valid phone number contains 10 digits" },
+                { required: true, message: "Nhập số điện thoại" },
+                { len: 10, message: "Nhập số điện thoại hợp lệ" },
               ]}
             >
               <Input
                 prefix={<PhoneOutlined />}
                 type="tel"
-                placeholder="Enter your phone number"
+                placeholder="Nhập số điện thoại"
                 maxLength={10}
               />
             </Form.Item>
@@ -171,7 +165,7 @@ export default function StaffManagement() {
             <Form.Item
               label="Vị trí"
               name="role"
-              rules={[{ required: true, message: "Please input role" }]}
+              rules={[{ required: true, message: "Chọn vị trí" }]}
             >
               <Select
                 options={[
@@ -186,38 +180,36 @@ export default function StaffManagement() {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Password"
+              label="Mật khẩu"
               name="password"
-              rules={[
-                { required: true, message: "Please input your password" },
-              ]}
+              rules={[{ required: true, message: "Nhập mật khẩu" }]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Confirm Password"
+              label="Xác nhận mật khẩu"
               name="passwordConfirmed"
               dependencies={["password"]}
               rules={[
-                { required: true, message: "Please confirm your password" },
+                { required: true, message: "Nhập xác nhận mật khẩu" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue("password") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error("Passwords do not match!"));
+                    return Promise.reject(new Error("Mật khẩu không khớp!"));
                   },
                 }),
               ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
-                placeholder="Confirm your password"
+                placeholder="Nhập xác nhận mật khẩu"
               />
             </Form.Item>
           </Col>

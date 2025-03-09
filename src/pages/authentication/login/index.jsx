@@ -18,17 +18,8 @@ function Login() {
       const res = await api.post("/auth/login", value);
       console.log(res.data);
       if (!res.data.errorCode) {
-        localStorage.setItem("token", res?.data?.access_token);
-        dispatch(login(res?.data));
-        if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
-          navigate("/admin/staff");
-        } else if (res.data.role === "STAFF") {
-          navigate("/staff");
-        } else {
-          navigate("/");
-        }
-        // localStorage.setItem("token", res?.data?.result.accessToken);
-        // dispatch(login(res?.data?.result));
+        // localStorage.setItem("token", res?.data?.access_token);
+        // dispatch(login(res?.data));
         // if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
         //   navigate("/admin/staff");
         // } else if (res.data.role === "STAFF") {
@@ -36,6 +27,18 @@ function Login() {
         // } else {
         //   navigate("/");
         // }
+        localStorage.setItem("token", res?.data?.result.accessToken);
+        dispatch(login(res?.data?.result));
+        if (
+          res.data.result.role === "ADMIN" ||
+          res.data.result.role === "MANAGER"
+        ) {
+          navigate("/admin/staff");
+        } else if (res.data.result.role === "STAFF") {
+          navigate("/staff");
+        } else {
+          navigate("/");
+        }
 
         toast.success("Đăng nhập thành công");
       } else {
