@@ -20,6 +20,8 @@ import UserManagement from "../pages/admin/manage-user";
 import ServiceManagement from "../pages/admin/manage-service";
 import PackageManagement from "../pages/admin/manage-package";
 import StaffLayout from "../layout/staff";
+import ReceptionistBooking from "../pages/receptionist/manage-booking"; 
+import ReceptionistCheckorder from "../pages/receptionist/checkorder";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -129,6 +131,24 @@ export const router = createBrowserRouter([
         <StaffLayout />
       </ProtectedRouteStaff>
     ),
+  },
+  {
+    path: "/receptionist",
+    element: (
+      <ProtectedRouteReceptionist>
+        <ReceptionistLayout />
+      </ProtectedRouteReceptionist>
+    ),
+    children: [
+      {
+        path: "/receptionist/booking",
+        element: <ReceptionistBooking />,
+      },
+      {
+        path: "/receptionist/checkorder",
+        element: <ReceptionistCheckorder />,
+      },
+    ],
   },
   {
     path: "login",
