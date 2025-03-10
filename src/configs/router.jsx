@@ -20,16 +20,9 @@ import UserManagement from "../pages/admin/manage-user";
 import ServiceManagement from "../pages/admin/manage-service";
 import PackageManagement from "../pages/admin/manage-package";
 import StaffLayout from "../layout/staff";
-<<<<<<< Updated upstream
-import ReceptionistBooking from "../pages/receptionist/manage-booking"; 
-import ReceptionistCheckorder from "../pages/receptionist/checkorder";
-=======
-import Detail from "../pages/user/detail";
 import ReceptionistLayout from "../layout/receptionist";
 import ReceptionistBooking from "../pages/receptionist/checkorder";
-//import ReceptionistCheckout from "../pages/receptionist/checkout";
- 
->>>>>>> Stashed changes
+
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -143,33 +136,14 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
-<<<<<<< Updated upstream
       <ProtectedRouteReceptionist>
         <ReceptionistLayout />
       </ProtectedRouteReceptionist>
     ),
     children: [
       {
-        path: "/receptionist/booking",
-        element: <ReceptionistBooking />,
-      },
-      {
-        path: "/receptionist/checkorder",
-        element: <ReceptionistCheckorder />,
-=======
-      //<ProtectedRouteReceptionist>
-        <ReceptionistLayout />
-      //</ProtectedRouteReceptionist>
-    ),
-    children: [
-      // {
-      //   path: "/receptionist/receptionistBooking",
-      //   element: <ReceptionistBooking />,
-      // },
-      {
         path: "/receptionist/checkorder",
         element: <ReceptionistBooking />,
->>>>>>> Stashed changes
       },
     ],
   },
