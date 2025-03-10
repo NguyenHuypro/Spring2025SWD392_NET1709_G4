@@ -1,7 +1,22 @@
-import { Button, Image, Modal, Popconfirm, Table, Select } from "antd";
+import {
+  Button,
+  Image,
+  Modal,
+  Popconfirm,
+  Table,
+  Select,
+  Descriptions,
+  Row,
+  Card,
+  Col,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
+import { changeCurr } from "../../../utils/utils";
+import moment from "moment-timezone";
+const { Text } = Typography;
 
 export default function BookingManagement() {
   const [dataSource, setDataSource] = useState([]);
@@ -9,6 +24,7 @@ export default function BookingManagement() {
   const [selectedStaffs, setSelectedStaffs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModal2Open, setIsModal2Open] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -25,9 +41,11 @@ export default function BookingManagement() {
     }
   };
 
-  const fetchAvailableStaffs = async () => {
+  const fetchAvailableStaffs = async (bookingId) => {
     try {
-      const res = await api.get("/users/available-staffs");
+      const res = await api.get(
+        `/users/available-staffs?bookingId=${bookingId}`
+      );
       if (!res.data.errorCode) {
         setStaffs(res.data.result);
         setIsModalOpen(true); // Mở modal sau khi lấy dữ liệu
@@ -39,7 +57,7 @@ export default function BookingManagement() {
 
   const handleAssignClick = (booking) => {
     setSelectedBooking(booking);
-    fetchAvailableStaffs();
+    fetchAvailableStaffs(booking.id);
   };
 
   const handleAssignStaffs = async () => {
@@ -122,7 +140,15 @@ export default function BookingManagement() {
       title: "Thao tác",
       render: (value, record) => (
         <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Chi tiết</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              setSelectedBooking(record);
+              setIsModal2Open(true);
+            }}
+          >
+            Chi tiết
+          </Button>
           {value.status === "PENDING" ? (
             <>
               <Popconfirm
@@ -134,13 +160,16 @@ export default function BookingManagement() {
                   const res = await api.put(`/bookings/${record.id}/status`, {
                     status: "CANCELLED",
                   });
-                  console.log(res.data);
                   fetchBookings();
                 }}
               >
                 <Button danger>Từ chối</Button>
               </Popconfirm>
-              <Button onClick={() => handleAssignClick(record)}>
+              <Button
+                onClick={() => {
+                  handleAssignClick(record);
+                }}
+              >
                 Phân công
               </Button>
             </>
@@ -152,9 +181,139 @@ export default function BookingManagement() {
     },
   ];
 
+  const bookingStatusMap = {
+    PENDING: { label: "Đang chờ xử lý", color: "warning" },
+    COMING: { label: "Đã xác nhận", color: "success" },
+    CHECKING: { label: "Đang kiểm tra và báo giá", color: "processing" },
+    IN_PROGRESS: { label: "Đang thực hiện", color: "processing" },
+    PENDING_PAYMENT: { label: "Chờ thanh toán", color: "processing" },
+    FINISHED: { label: "Hoàn thành", color: "success" },
+    CANCELLED: { label: "Đã hủy", color: "danger" },
+  };
+
   return (
     <>
       <Table dataSource={dataSource} columns={columns} />
+
+      <Modal
+        open={isModal2Open}
+        onCancel={() => {
+          setIsModal2Open(false);
+          setSelectedBooking(null);
+        }}
+        width={1200}
+      >
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {" "}
+          <Card
+            title="Thông tin chi tiết"
+            bordered={false}
+            style={{
+              width: 1200,
+              borderRadius: 10,
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            }}
+          >
+            <Row gutter={16}>
+              {/* Cột hình ảnh */}
+              <Col span={12}>
+                <Image
+                  src={selectedBooking?.evidence}
+                  style={{ borderRadius: 10, objectFit: "cover" }}
+                  width={500}
+                />
+              </Col>
+
+              {/* Cột thông tin chi tiết */}
+              <Col span={12}>
+                <Descriptions column={1} bordered size="middle">
+                  <Descriptions.Item label="Tên người đặt">
+                    <Text strong>
+                      {selectedBooking?.name || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Số điện thoại">
+                    <Text>{selectedBooking?.phone || "Không xác địch"}</Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Biển số xe">
+                    <Text>
+                      {selectedBooking?.licensePlate || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Địa điểm cứu hộ">
+                    <Text>{selectedBooking?.location || "Không xác địch"}</Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Tình trạng">
+                    <Text type="danger">
+                      {selectedBooking?.description || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Trạng thái booking">
+                    <Text
+                      type={
+                        bookingStatusMap[selectedBooking?.status]?.color ||
+                        "secondary"
+                      }
+                    >
+                      {bookingStatusMap[selectedBooking?.status]?.label ||
+                        "Không xác định"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Nhân viên cứu hộ 1">
+                    <Text type="secondary">
+                      {selectedBooking?.staff1?.fullName || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Số điện thoại nhân viên cứu hộ 1">
+                    <Text type="secondary">
+                      {selectedBooking?.staff1?.phone || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Nhân viên cứu hộ 2">
+                    <Text type="secondary">
+                      {selectedBooking?.staff2?.fullName || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Số điện thoại nhân viên cứu hộ 2">
+                    <Text type="secondary">
+                      {selectedBooking?.staff2?.phone || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Thời gian đến">
+                    <Text type="secondary">
+                      {moment(selectedBooking?.arrivalDate).format(
+                        "DD-MM-YYYY HH:mm:ss"
+                      ) || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Thời gian hoàn thành">
+                    <Text type="secondary">
+                      {moment(selectedBooking?.completedDate).format(
+                        "DD-MM-YYYY HH:mm:ss"
+                      ) || "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Các dịch vụ đã làm">
+                    {selectedBooking?.services?.map((service) => (
+                      <Text type="secondary" key={service.id}>
+                        {service?.name}
+                      </Text>
+                    ))}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Tổng tiền">
+                    <Text type="danger">
+                      {!isNaN(selectedBooking?.totalPrice)
+                        ? changeCurr(selectedBooking?.totalPrice)
+                        : "Không xác địch"}
+                    </Text>
+                  </Descriptions.Item>
+                </Descriptions>
+              </Col>
+            </Row>
+          </Card>
+        </div>
+      </Modal>
 
       {/* Modal Phân công */}
       <Modal

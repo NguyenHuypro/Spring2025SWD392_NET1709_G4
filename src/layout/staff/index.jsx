@@ -18,6 +18,7 @@ const StaffLayout = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalDiscount, setSetTotalDiscount] = useState(null);
 
   const items = [
     {
@@ -33,12 +34,13 @@ const StaffLayout = () => {
 
   const fetchBookingsByStaffId = async () => {
     try {
-      const res = await api.get(`/bookings/staff/${user.id}`);
+      const res = await api.get(`/bookings/staff/${user.userID}`);
+      console.log(res.data.result);
       if (!res.data.errorCode) {
         setDataSource(res.data.result);
       }
     } catch (error) {
-      toast.error("Lỗi khi tải danh sách nhiệm vụ!");
+      toast.error("Lỗi khi tải danh sách nhiệm vụ!", error.message);
     }
   };
 
@@ -54,7 +56,6 @@ const StaffLayout = () => {
       } else {
         toast.error("Có lỗi xảy ra");
       }
-      // Refresh dữ liệu sau khi cập nhật
     } catch (error) {
       toast.error(error.message);
     }
@@ -73,12 +74,45 @@ const StaffLayout = () => {
     }
   };
 
+  const handleChecking = async () => {
+    try {
+      const res = await api.post(
+        `/bookings/add-service/${selectedBooking.id}`,
+        {
+          selectedServices,
+        }
+      );
+      setSetTotalDiscount(res.data.result.totalPrice);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const handleClickFinish = async (value) => {
     console.log(value);
     await fetchServices();
     setIsModalOpen(true);
     setSelectedBooking(value);
   };
+
+  const handleConfirmStaff = async (bookingId, staffId) => {
+    try {
+      const res = await api.post(
+        `/bookings/${bookingId}/confirm-staff/${staffId}`
+      );
+      console.log(res.data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // const handleAgree = async (bookingId, totalDiscount) => {
+  //   try {
+  //     const res = await api.post("")
+  //   } catch (error) {
+  //     toast.error("Lỗi khi thanh toán", error.message)
+  //   }
+  // }
 
   const columns = [
     {
@@ -141,13 +175,64 @@ const StaffLayout = () => {
         <div style={{ display: "flex", gap: 10 }}>
           <Button type="primary">Chi tiết</Button>
           {value.status === "COMING" && (
-            <Button
-              onClick={() => updateBookingStatus(record.id, "IN-PROGRESS")}
-            >
-              Đã đến nơi
-            </Button>
+            <>
+              {user.userID === value.staff1?.id &&
+                !value.staff1?.confirmStaff && (
+                  <Button
+                    onClick={() => handleConfirmStaff(record.id, user.userID)}
+                  >
+                    Tôi đã đến nơi
+                  </Button>
+                )}
+
+              {user.userID === value.staff2?.id &&
+                !value.staff2?.confirmStaff && (
+                  <Button
+                    onClick={() => handleConfirmStaff(record.id, user.userID)}
+                  >
+                    Tôi đã đến nơi
+                  </Button>
+                )}
+
+              {value.staff1?.confirmStaff && value.staff2?.confirmStaff && (
+                <Button disabled>Đã xác nhận đủ</Button>
+              )}
+
+              {value.staff1?.confirmStaff &&
+                user.userID === value.staff2?.id &&
+                !value.staff2?.confirmStaff && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+
+              {value.staff2?.confirmStaff &&
+                user.userID === value.staff1?.id &&
+                !value.staff1?.confirmStaff && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+            </>
           )}
-          {value.status === "IN-PROGRESS" && (
+
+          {value.status === "CHECKING" && (
+            <>
+              <Button
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setSelectedBooking(record);
+                }}
+              >
+                Báo giá
+              </Button>
+              <Button
+                danger
+                onClick={() => {
+                  updateBookingStatus(record.id, "CANCELLED");
+                }}
+              >
+                Hủy
+              </Button>
+            </>
+          )}
+          {value.status === "IN_PROGRESS" && (
             <Button
               onClick={() => {
                 handleClickFinish(record.id);
@@ -177,6 +262,7 @@ const StaffLayout = () => {
       setTotalPrice((prevTotal) => prevTotal - (selectedService?.price || 0));
     }
   };
+
   const serviceColumns = [
     {
       title: "Chọn",
@@ -202,35 +288,34 @@ const StaffLayout = () => {
     },
   ];
 
-  const handleConfirmCompletion = async () => {
-    if (!selectedBooking) {
-      toast.error("Lỗi: Không tìm thấy ID của booking!");
-      return;
-    }
-    if (selectedServices.length === 0) {
-      toast.error("Chọn ít nhất 1 dịch vụ trước khi tiếp tục");
-      return;
-    }
-    try {
-      const res = await api.put(`/bookings/${selectedBooking}/status`, {
-        status: "PENDING_PAYMENT",
-        totalPrice,
-        services: selectedServices,
-      });
-      console.log(res);
-      if (!res.data.errorCode) {
-        toast.success("Cập nhật thành công");
-        fetchBookingsByStaffId();
-        setIsModalOpen(false);
-      } else {
-        toast.error("Có lỗi xảy ra");
-      }
-      // Refresh dữ liệu sau khi cập nhật
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
+  // const handleConfirmCompletion = async () => {
+  //   if (!selectedBooking) {
+  //     toast.error("Lỗi: Không tìm thấy ID của booking!");
+  //     return;
+  //   }
+  //   if (selectedServices.length === 0) {
+  //     toast.error("Chọn ít nhất 1 dịch vụ trước khi tiếp tục");
+  //     return;
+  //   }
+  //   try {
+  //     const res = await api.put(`/bookings/${selectedBooking}/status`, {
+  //       status: "PENDING_PAYMENT",
+  //       totalPrice,
+  //       services: selectedServices,
+  //     });
+  //     console.log(res);
+  //     if (!res.data.errorCode) {
+  //       toast.success("Cập nhật thành công");
+  //       fetchBookingsByStaffId();
+  //       setIsModalOpen(false);
+  //     } else {
+  //       toast.error("Có lỗi xảy ra");
+  //     }
+  //     // Refresh dữ liệu sau khi cập nhật
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   }
+  // };
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -261,16 +346,22 @@ const StaffLayout = () => {
           setIsModalOpen(false);
           setSelectedServices([]);
           setTotalPrice(0);
+          setSetTotalDiscount(null);
         }}
-        onOk={handleConfirmCompletion}
+        onOk={handleChecking}
         okText="Xác nhận"
         cancelText="Hủy"
       >
         <p>Chọn các dịch vụ đã thực hiện trước khi hoàn thành nhiệm vụ:</p>
         <Table dataSource={services} columns={serviceColumns} />
         <p>
-          <strong>Tổng tiền:</strong> {changeCurr(totalPrice)}
+          <strong>Tạm tính:</strong> {changeCurr(totalPrice)}
         </p>
+        <p>
+          <strong>Tổng tiền:</strong>{" "}
+          {totalDiscount ? changeCurr(totalDiscount) : "Chưa tính"}
+        </p>
+        {totalDiscount && <Button type="primary">Đồng ý sửa</Button>}
       </Modal>
     </Layout>
   );

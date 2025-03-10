@@ -13,7 +13,9 @@ export default function Detail() {
   const bookingStatusMap = {
     PENDING: { label: "Đang chờ xử lý", color: "warning" },
     COMING: { label: "Đã xác nhận", color: "success" },
-    "IN-PROGRESS": { label: "Đang thực hiện", color: "processing" },
+    CHECKING: { label: "Đang kiểm tra và báo giá", color: "processing" },
+    IN_PROGRESS: { label: "Đang thực hiện", color: "processing" },
+    PENDING_PAYMENT: { label: "Chờ thanh toán", color: "processing" },
     FINISHED: { label: "Hoàn thành", color: "success" },
     CANCELLED: { label: "Đã hủy", color: "danger" },
   };

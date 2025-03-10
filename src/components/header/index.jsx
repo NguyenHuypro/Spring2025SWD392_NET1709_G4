@@ -105,6 +105,25 @@ function Header() {
                 onFinish={handleSubmitForm}
               >
                 <FormItem
+                  label="Xe"
+                  name="carId"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Địa điểm cứu hộ không được để trống",
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn xe"
+                    options={cars.map((car) => ({
+                      label: `${car.brand} ${car.model} ${car.licensePlate}`,
+                      value: car.id,
+                    }))}
+                  />
+                </FormItem>
+
+                <FormItem
                   label="Tình trạng"
                   name="description"
                   rules={[
@@ -144,24 +163,7 @@ function Header() {
                 >
                   <Input />
                 </FormItem>
-                <FormItem
-                  label="Xe"
-                  name="carId"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Địa điểm cứu hộ không được để trống",
-                    },
-                  ]}
-                >
-                  <Select
-                    placeholder="Chọn xe"
-                    options={cars.map((car) => ({
-                      label: `${car.brand} ${car.model} ${car.licensePlate}`,
-                      value: car.id,
-                    }))}
-                  />
-                </FormItem>
+
                 <Form.Item label="Hình ảnh" name="image">
                   <Upload
                     listType="picture-card"
