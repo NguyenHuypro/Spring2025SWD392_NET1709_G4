@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import UserLayout from "../layout/user";
 import Login from "../pages/authentication/login";
@@ -21,6 +22,7 @@ import ServiceManagement from "../pages/admin/manage-service";
 import PackageManagement from "../pages/admin/manage-package";
 import StaffLayout from "../layout/staff";
 import Detail from "../pages/user/detail";
+import PaymentSuccess from "../pages/user/payment-success";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -97,6 +99,14 @@ export const router = createBrowserRouter([
           <ProtectedRouteUser>
             <Package />
           </ProtectedRouteUser>
+        ),
+      },
+      {
+        path: "/payment-success",
+        element: (
+          // <ProtectedRouteUser>
+          <PaymentSuccess />
+          // </ProtectedRouteUser>
         ),
       },
     ],
