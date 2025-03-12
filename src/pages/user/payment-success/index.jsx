@@ -15,10 +15,10 @@ function PaymentSuccess() {
 
   const handleUpdateTransactionStatus = async () => {
     try {
-      const res = await api.put("", {
+      const res = await api.put("/payment/callback", {
         transactionId,
       });
-      console.log(res.data);
+      console.log(res.data.result);
     } catch (error) {
       toast.error(error.message);
     }
