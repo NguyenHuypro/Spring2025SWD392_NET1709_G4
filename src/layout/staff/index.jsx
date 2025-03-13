@@ -89,7 +89,6 @@ const StaffLayout = () => {
   };
 
   const handleClickFinish = async (value) => {
-    console.log(value);
     await fetchServices();
     setIsModalOpen(true);
     setSelectedBooking(value);
@@ -105,14 +104,6 @@ const StaffLayout = () => {
       toast.error(error.message);
     }
   };
-
-  // const handleAgree = async (bookingId, totalDiscount) => {
-  //   try {
-  //     const res = await api.post("")
-  //   } catch (error) {
-  //     toast.error("Lỗi khi thanh toán", error.message)
-  //   }
-  // }
 
   const columns = [
     {
@@ -216,6 +207,7 @@ const StaffLayout = () => {
             <>
               <Button
                 onClick={() => {
+                  fetchServices();
                   setIsModalOpen(true);
                   setSelectedBooking(record);
                 }}
@@ -361,7 +353,16 @@ const StaffLayout = () => {
           <strong>Tổng tiền:</strong>{" "}
           {totalDiscount ? changeCurr(totalDiscount) : "Chưa tính"}
         </p>
-        {totalDiscount && <Button type="primary">Đồng ý sửa</Button>}
+        {totalDiscount && (
+          <Button
+            type="primary"
+            onClick={() => {
+              updateBookingStatus(selectedBooking.id, "IN_PROGRESS");
+            }}
+          >
+            Đồng ý sửa
+          </Button>
+        )}
       </Modal>
     </Layout>
   );

@@ -62,7 +62,7 @@ export default function Checkout() {
       };
 
       const res = await api.post("/payment", paymentData);
-      console.log(res.data);
+      console.log(res.data.result);
 
       if (!res.data.errorCode && res.data.result) {
         window.open(res.data.result, "_blank");

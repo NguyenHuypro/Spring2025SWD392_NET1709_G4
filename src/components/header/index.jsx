@@ -110,7 +110,7 @@ function Header() {
                   rules={[
                     {
                       required: true,
-                      message: "Địa điểm cứu hộ không được để trống",
+                      message: "Xe không được để trống",
                     },
                   ]}
                 >
@@ -148,6 +148,7 @@ function Header() {
                       message: "Số điện thoại phải bao gồm 10 số",
                     },
                   ]}
+                  initialValue={user.phone}
                 >
                   <Input />
                 </FormItem>

@@ -10,12 +10,12 @@ function PaymentSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const transactionStatus = queryParams.get("transactionStatus");
-  const transactionId = queryParams.get("vnp_TxnRef");
+  const transactionStatus = queryParams.get("vnp_TransactionStatus");
+  const transactionId = queryParams.get("vnp_OrderInfo");
 
   const handleUpdateTransactionStatus = async () => {
     try {
-      const res = await api.put("/payment/callback", {
+      const res = await api.post("/payment/callback", {
         transactionId,
       });
       console.log(res.data.result);

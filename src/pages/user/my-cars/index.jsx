@@ -150,6 +150,7 @@ function MyCars() {
     try {
       const res = await api.get("/cars/my-cars");
       console.log(res.data.result);
+
       if (!res.data.errorCode) {
         setDataSource(res.data.result);
       } else {
