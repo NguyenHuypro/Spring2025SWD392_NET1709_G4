@@ -61,7 +61,7 @@ export default function Checkout() {
         carId: selectedCar.id, // Chỉ truyền 1 xe
       };
 
-      const res = await api.post("/payment", paymentData);
+      const res = await api.post("/cars/purchase-package", paymentData);
       console.log(res.data.result);
 
       if (!res.data.errorCode && res.data.result) {

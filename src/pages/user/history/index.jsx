@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 function History() {
   const [dataSource, setDataSource] = useState([]);
   const navigate = useNavigate();
+
   const columns = [
     {
       title: "Thời điểm đặt lịch",
@@ -66,7 +67,7 @@ function History() {
             <Button
               type="primary"
               onClick={() => {
-                handleClickPayment(record.id, record.totalPrice);
+                handleClickPayment(record.id);
               }}
             >
               Thanh toán
@@ -90,8 +91,7 @@ function History() {
     }
   };
 
-  const handleClickPayment = async (id, totalPrice) => {
-    console.log(id, totalPrice);
+  const handleClickPayment = async (id) => {
     try {
       const res = await api.post("/payment/booking", { bookingId: id });
       if (!res.data.errorCode) {
@@ -103,6 +103,7 @@ function History() {
       toast.error(error.message);
     }
   };
+
   useEffect(() => {
     fetchBookingsByUserId();
   }, []);

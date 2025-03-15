@@ -53,6 +53,7 @@ const StaffLayout = () => {
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
+        setIsModalOpen(false);
       } else {
         toast.error("Có lỗi xảy ra");
       }
@@ -224,6 +225,10 @@ const StaffLayout = () => {
               </Button>
             </>
           )}
+
+          {value.status === "PENDING_PAYMENT" && (
+            <Button disabled>Chờ khách hàng thanh toán</Button>
+          )}
           {value.status === "IN_PROGRESS" && (
             <Button
               onClick={() => {
@@ -357,7 +362,7 @@ const StaffLayout = () => {
           <Button
             type="primary"
             onClick={() => {
-              updateBookingStatus(selectedBooking.id, "IN_PROGRESS");
+              updateBookingStatus(selectedBooking.id, "PENDING_PAYMENT");
             }}
           >
             Đồng ý sửa
