@@ -89,17 +89,12 @@ const StaffLayout = () => {
     }
   };
 
-  const handleClickFinish = async (value) => {
-    await fetchServices();
-    setIsModalOpen(true);
-    setSelectedBooking(value);
-  };
-
   const handleConfirmStaff = async (bookingId, staffId) => {
     try {
       const res = await api.post(
         `/bookings/${bookingId}/confirm-staff/${staffId}`
       );
+      fetchBookingsByStaffId();
       console.log(res.data);
     } catch (error) {
       toast.error(error.message);
@@ -232,7 +227,7 @@ const StaffLayout = () => {
           {value.status === "IN_PROGRESS" && (
             <Button
               onClick={() => {
-                handleClickFinish(record.id);
+                updateBookingStatus(record.id, "FINISHED");
               }}
               type="primary"
             >

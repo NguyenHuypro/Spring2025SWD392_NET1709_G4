@@ -15,9 +15,9 @@ function PaymentSuccess() {
 
   const handleUpdateTransactionStatus = async () => {
     try {
-      const arr = orderInfo.split("-");
+      const arr = orderInfo.split("/");
       let res;
-      if (arr[1] === "package") {
+      if (arr[arr[1]] === "package") {
         res = await api.post("/payment/callback", {
           transactionId: arr[0],
         });
