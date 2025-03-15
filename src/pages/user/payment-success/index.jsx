@@ -11,13 +11,22 @@ function PaymentSuccess() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const transactionStatus = queryParams.get("vnp_TransactionStatus");
-  const transactionId = queryParams.get("vnp_OrderInfo");
+  const orderInfo = queryParams.get("vnp_OrderInfo");
 
   const handleUpdateTransactionStatus = async () => {
     try {
-      const res = await api.post("/payment/callback", {
-        transactionId,
-      });
+      const arr = orderInfo.split("-");
+      let res;
+      if (arr[1] === "package") {
+        res = await api.post("/payment/callback", {
+          transactionId: arr[0],
+        });
+      } else {
+        res = await api.post("/payment/callback-booking", {
+          transactionId: arr[0],
+        });
+      }
+
       console.log(res.data.result);
     } catch (error) {
       toast.error(error.message);
