@@ -119,11 +119,19 @@ export default function Detail() {
                 </Text>
               </Descriptions.Item>
               <Descriptions.Item label="Các dịch vụ đã làm">
-                {booking?.services?.map((service) => (
-                  <Text type="secondary" key={service.id}>
-                    {service?.name}
-                  </Text>
-                ))}
+                {booking?.services?.map((service, index) => {
+                  if (index === booking.services.length - 1)
+                    return (
+                      <Text type="secondary" key={service.id}>
+                        {`${service?.name}`}
+                      </Text>
+                    );
+                  return (
+                    <Text type="secondary" key={service.id}>
+                      {`${service?.name}, `}
+                    </Text>
+                  );
+                })}
               </Descriptions.Item>
               <Descriptions.Item label="Tổng tiền">
                 <Text type="danger">

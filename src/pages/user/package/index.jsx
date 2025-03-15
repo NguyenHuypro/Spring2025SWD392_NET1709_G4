@@ -9,10 +9,13 @@ export default function Package() {
   const [dataSource, setDataSource] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModal2Open, setIsModal2Open] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false); // Modal xác nhận nâng cấp
 
   const [currentPackage, setCurrentPackage] = useState(null);
   const [selectedCar, setSelectedCar] = useState(null);
   const [cars, setCars] = useState([]);
+
+  const [pendingCar, setPendingCar] = useState(null); // Lưu trữ xe đang chờ xác nhận nâng cấp
 
   const navigate = useNavigate();
 
@@ -92,18 +95,35 @@ export default function Package() {
         setCars(res.data.result);
       }
     } catch (error) {
-      toast.error("Lỗi khi tải danh sách xe.");
+      toast.error("Lỗi khi tải danh sách xe.", error);
     }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setIsModal2Open(false);
+    setIsUpgradeModalOpen(false);
     setSelectedCar(null);
+    setPendingCar(null);
   };
 
   const handleCarChange = (e) => {
-    setSelectedCar(e.target.value);
+    const carId = e.target.value;
+    const selectedCarObj = cars.find((car) => car.id === carId);
+    const packageName = selectedCarObj?.package?.name?.toLowerCase();
+    const currentPackageName = currentPackage?.name?.toLowerCase();
+
+    if (packageName && packageName !== currentPackageName) {
+      setPendingCar(carId);
+      setIsUpgradeModalOpen(true);
+    } else {
+      setSelectedCar(carId);
+    }
+  };
+
+  const handleConfirmUpgrade = () => {
+    setSelectedCar(pendingCar);
+    setIsUpgradeModalOpen(false);
   };
 
   const handleBuyPackage = () => {
@@ -111,7 +131,6 @@ export default function Package() {
       toast.error("Vui lòng chọn xe trước khi tiếp tục.");
       return;
     }
-
     navigate(`/checkout?packageId=${currentPackage.id}&car=${selectedCar}`);
   };
 
@@ -141,16 +160,52 @@ export default function Package() {
         okButtonProps={{ disabled: !selectedCar }}
       >
         <Radio.Group onChange={handleCarChange} value={selectedCar}>
-          {cars.map((car) => (
-            <Radio
-              key={car.id}
-              value={car.id}
-              style={{ display: "block", marginBottom: "10px" }}
-            >
-              {car.brand} {car.model} ({car.licensePlate})
-            </Radio>
-          ))}
+          {cars.map((car) => {
+            const packageName = car?.package?.name?.toLowerCase();
+            const currentPackageName = currentPackage?.name?.toLowerCase();
+
+            if (packageName) {
+              if (
+                packageName === "gói cơ bản" &&
+                currentPackageName === "gói cơ bản"
+              ) {
+                return null;
+              }
+              if (
+                packageName === "gói toàn diện" &&
+                currentPackageName !== "gói cao cấp"
+              ) {
+                return null;
+              }
+              if (packageName === "gói cao cấp") {
+                return null;
+              }
+            }
+
+            return (
+              <Radio
+                key={car.id}
+                value={car.id}
+                style={{ display: "block", marginBottom: "10px" }}
+              >
+                {car.brand} {car.model} ({car.licensePlate})
+              </Radio>
+            );
+          })}
         </Radio.Group>
+      </Modal>
+
+      {/* Modal Xác Nhận Nâng Cấp */}
+      <Modal
+        open={isUpgradeModalOpen}
+        title="Xác nhận nâng cấp"
+        onOk={handleConfirmUpgrade}
+        onCancel={handleCloseModal}
+      >
+        <p>
+          Xe bạn chọn đã có gói dịch vụ khác. Bạn có chắc chắn muốn nâng cấp lên{" "}
+          <b>{currentPackage?.name}</b> không?
+        </p>
       </Modal>
     </div>
   );
