@@ -23,6 +23,8 @@ import PackageManagement from "../pages/admin/manage-package";
 import StaffLayout from "../layout/staff";
 import Detail from "../pages/user/detail";
 import PaymentSuccess from "../pages/user/payment-success";
+import ReceptionistLayout from "../layout/receptionist";
+import ReceptionistBooking from "../pages/receptionist/checkorder";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -148,6 +150,20 @@ export const router = createBrowserRouter([
         <StaffLayout />
       </ProtectedRouteStaff>
     ),
+  },
+  {
+    path: "/receptionist",
+    element: (
+      <ProtectedRouteReceptionist>
+        <ReceptionistLayout />
+      </ProtectedRouteReceptionist>
+    ),
+    children: [
+      {
+        path: "/receptionist/checkorder",
+        element: <ReceptionistBooking />,
+      },
+    ],
   },
   {
     path: "login",
