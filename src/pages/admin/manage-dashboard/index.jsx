@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Card, Row, Col, Spin } from "antd";
-import api from "../../configs/axios";
 import { toast } from "react-toastify";
+import api from "../../../configs/axios";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 

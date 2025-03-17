@@ -118,9 +118,9 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <ProtectedRouteAdmin>
+      //<ProtectedRouteAdmin>
         <AdminLayout />
-      </ProtectedRouteAdmin>
+      //</ProtectedRouteAdmin>
     ),
     children: [
       {
@@ -161,9 +161,9 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
-       <ProtectedRouteReceptionist>
+       //<ProtectedRouteReceptionist>
         <ReceptionistLayout />
-       </ProtectedRouteReceptionist>
+       //</ProtectedRouteReceptionist>
     ),
     children: [
       {
