@@ -154,9 +154,9 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
-      <ProtectedRouteReceptionist>
-        <ReceptionistLayout />
-      </ProtectedRouteReceptionist>
+      // <ProtectedRouteReceptionist>
+      <ReceptionistLayout />
+      // </ProtectedRouteReceptionist>
     ),
     children: [
       {
