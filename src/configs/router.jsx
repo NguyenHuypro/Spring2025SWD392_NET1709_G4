@@ -25,6 +25,8 @@ import Detail from "../pages/user/detail";
 import PaymentSuccess from "../pages/user/payment-success";
 import ReceptionistLayout from "../layout/receptionist";
 import ReceptionistBooking from "../pages/receptionist/checkorder";
+import DashboardManagement from "../pages/admin/manage-dashboard/Index";
+
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -106,9 +108,9 @@ export const router = createBrowserRouter([
       {
         path: "/payment-success",
         element: (
-          // <ProtectedRouteUser>
+           //<ProtectedRouteUser>
           <PaymentSuccess />
-          // </ProtectedRouteUser>
+           //</ProtectedRouteUser>
         ),
       },
     ],
@@ -121,6 +123,11 @@ export const router = createBrowserRouter([
       </ProtectedRouteAdmin>
     ),
     children: [
+      {
+        path: "/admin/dashboard", // Default dashboard route
+        element: <DashboardManagement />,
+
+      },
       {
         path: "/admin/staff",
         element: <StaffManagement />,
@@ -154,9 +161,9 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
-      <ProtectedRouteReceptionist>
+       <ProtectedRouteReceptionist>
         <ReceptionistLayout />
-      </ProtectedRouteReceptionist>
+       </ProtectedRouteReceptionist>
     ),
     children: [
       {
