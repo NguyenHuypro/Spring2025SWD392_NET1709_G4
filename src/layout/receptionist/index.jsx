@@ -36,7 +36,8 @@ const ReceptionistLayout = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await api.get("/bookings");
+      const res = await api.get("/bookings/guest");
+      console.log(res.data.result);
       if (!res.data.errorCode) {
         setDataSource(res.data);
       }
@@ -51,10 +52,9 @@ const ReceptionistLayout = () => {
 
   const handleSubmitBooking = async () => {
     try {
-      const res = await api.post("/bookings", {
-        ...newBooking,
-        status: "PENDING",
-      });
+      console.log(newBooking);
+      const res = await api.post("/bookings/receptionist", newBooking);
+      console.log(res.data.result);
       if (!res.data.errorCode) {
         toast.success("Tạo booking thành công!");
         fetchBookings();
