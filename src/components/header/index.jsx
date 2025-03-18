@@ -54,7 +54,8 @@ function Header() {
       const url = await uploadFile(value.image.fileList[0].originFileObj);
       value.evidence = url;
       const res = await api.post("/bookings", value);
-      if (!res.data.errorCode) {
+      console.log(res.data.message);
+      if (res.data.result) {
         toast.success("Đặt cứu hộ thành công");
         form.resetFields();
         setIsModalOpen(false);
