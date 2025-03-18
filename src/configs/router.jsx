@@ -161,9 +161,11 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
+
        //<ProtectedRouteReceptionist>
         <ReceptionistLayout />
        //</ProtectedRouteReceptionist>
+
     ),
     children: [
       {

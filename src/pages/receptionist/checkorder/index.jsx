@@ -1,11 +1,10 @@
-import { Button, Card, Input, Select, Typography, Form } from "antd";
+import { Button, Card, Input, Typography, Form } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title } = Typography;
 
 export default function ReceptionistBooking() {
   const navigate = useNavigate();
@@ -17,18 +16,18 @@ export default function ReceptionistBooking() {
     try {
       const res = await api.post("/bookings", {
         ...values,
-        status: "PENDING", // Đánh dấu booking đang chờ xử lý
+        status: "PENDING",
       });
 
       if (!res.data.errorCode) {
         toast.success("Tạo booking thành công!");
-        form.resetFields(); // Xóa dữ liệu sau khi tạo booking
-        navigate("/admin/receptionist"); // Quay lại trang danh sách booking
+        form.resetFields();
+        navigate("/admin/receptionist");
       } else {
         toast.error("Có lỗi xảy ra khi tạo booking.");
       }
     } catch (error) {
-      toast.error("Lỗi khi tiếp nhận booking.");
+      toast.error("Lỗi khi tiếp nhận booking.", error);
     } finally {
       setLoading(false);
     }
@@ -52,7 +51,9 @@ export default function ReceptionistBooking() {
           <Form.Item
             label="Tên khách hàng"
             name="customerName"
-            rules={[{ required: true, message: "Vui lòng nhập tên khách hàng!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên khách hàng!" },
+            ]}
           >
             <Input placeholder="Nhập tên khách hàng" />
           </Form.Item>
@@ -60,7 +61,9 @@ export default function ReceptionistBooking() {
           <Form.Item
             label="Số điện thoại"
             name="phone"
-            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+            ]}
           >
             <Input placeholder="Nhập số điện thoại" />
           </Form.Item>
@@ -76,7 +79,9 @@ export default function ReceptionistBooking() {
           <Form.Item
             label="Vị trí cứu hộ"
             name="location"
-            rules={[{ required: true, message: "Vui lòng nhập địa điểm cứu hộ!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập địa điểm cứu hộ!" },
+            ]}
           >
             <Input placeholder="Nhập địa chỉ hoặc vị trí sự cố" />
           </Form.Item>

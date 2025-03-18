@@ -1,14 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Row,
-  Select,
-  Table,
-  Checkbox,
-} from "antd";
+import { Button, Col, Form, Input, Modal, Row, Table, Checkbox } from "antd";
 import { useState, useEffect } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
@@ -21,9 +11,9 @@ export default function PackageManagement() {
   const [currentPackage, setCurrentPackage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
-  const [services, setServices] = useState([]); // Danh sách dịch vụ
-  const [selectedServices, setSelectedServices] = useState([]); // Dịch vụ được chọn
-  const [selectedServiceNames, setSelectedServiceNames] = useState([]); // Tên dịch vụ được chọn
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedServiceNames, setSelectedServiceNames] = useState([]);
 
   useEffect(() => {
     fetchPackages();
@@ -43,7 +33,7 @@ export default function PackageManagement() {
 
   const fetchServices = async () => {
     try {
-      const res = await api.get("/services"); // Gọi API lấy danh sách dịch vụ
+      const res = await api.get("/services");
       if (!res.data.errorCode) {
         setServices(res.data);
       }
@@ -71,8 +61,8 @@ export default function PackageManagement() {
       .filter((service) => selectedServices.includes(service._id))
       .map((service) => service.name);
 
-    setSelectedServiceNames(selectedNames); // Lưu tên dịch vụ
-    form.setFieldsValue({ services: selectedServices }); // Cập nhật vào form
+    setSelectedServiceNames(selectedNames);
+    form.setFieldsValue({ services: selectedServices });
     setIsServiceModalOpen(false);
   };
 
@@ -86,7 +76,6 @@ export default function PackageManagement() {
 
   const handleSubmitForm = async (values) => {
     try {
-      console.log(values);
       const res = await api.post("/packages", values);
       if (!res.data.errorCode) {
         setDataSource([res.data, ...dataSource]);

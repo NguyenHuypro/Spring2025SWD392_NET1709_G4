@@ -6,6 +6,7 @@ import { selectUser } from "../../redux/features/counterSlice";
 import api from "../../configs/axios";
 import { toast } from "react-toastify";
 import { changeCurr } from "../../utils/utils";
+
 const { Content, Footer, Sider } = Layout;
 
 const StaffLayout = () => {
@@ -16,17 +17,10 @@ const StaffLayout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [selectedBooking, setSelectedBooking] = useState();
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [totalDiscount, setSetTotalDiscount] = useState(null);
-
-  const items = [
-    {
-      key: "1",
-      label: "Quản lí cứu hộ",
-      onClick: () => navigate("/admin/staff"), // Điều hướng khi bấm vào
-    },
-  ];
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [isButtonShow, setIsButtonShow] = useState(false);
 
   useEffect(() => {
     fetchBookingsByStaffId();
@@ -35,7 +29,6 @@ const StaffLayout = () => {
   const fetchBookingsByStaffId = async () => {
     try {
       const res = await api.get(`/bookings/staff/${user.userID}`);
-      console.log(res.data.result);
       if (!res.data.errorCode) {
         setDataSource(res.data.result);
       }
@@ -47,9 +40,9 @@ const StaffLayout = () => {
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       const res = await api.put(`/bookings/${bookingId}/status`, {
-        status: newStatus,
+        status: statusToUpdate,
       });
-      console.log(res.data);
+
       if (!res.data.errorCode) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
@@ -57,6 +50,7 @@ const StaffLayout = () => {
       } else {
         toast.error("Có lỗi xảy ra");
       }
+      setIsButtonShow(false);
     } catch (error) {
       toast.error(error.message);
     }
@@ -76,6 +70,7 @@ const StaffLayout = () => {
   };
 
   const handleChecking = async () => {
+    if (!selectedBooking) return;
     try {
       const res = await api.post(
         `/bookings/add-service/${selectedBooking.id}`,
@@ -83,254 +78,109 @@ const StaffLayout = () => {
           selectedServices,
         }
       );
-      setSetTotalDiscount(res.data.result.totalPrice);
+
+      // Đặt totalDiscount trước, sau đó hiển thị nút "Đồng ý sửa"
+      const discount = res.data.result?.totalPrice ?? 0;
+      setTotalDiscount(discount);
+      toast.success("Đã báo giá");
+
+      // Nếu đã có giá trị totalDiscount, hiển thị nút
+      if (discount !== null && discount !== undefined) {
+        setIsButtonShow(true);
+      }
     } catch (error) {
       toast.error(error.message);
     }
   };
-
-  const handleConfirmStaff = async (bookingId, staffId) => {
-    try {
-      const res = await api.post(
-        `/bookings/${bookingId}/confirm-staff/${staffId}`
-      );
-      fetchBookingsByStaffId();
-      console.log(res.data);
-    } catch (error) {
-      toast.error(error.message);
+  useEffect(() => {
+    if (totalDiscount !== null && totalDiscount !== undefined) {
+      setIsButtonShow(true);
     }
-  };
-
-  const columns = [
-    {
-      title: "Tên",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Mô tả",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Số điện thoại",
-      dataIndex: "phone",
-      key: "phone",
-    },
-    {
-      title: "Nhân viên cứu hộ 1",
-      dataIndex: "staff1",
-      key: "staff1",
-      render: (user) => user?.fullName,
-    },
-    {
-      title: "Nhân viên cứu hộ 2",
-      dataIndex: "staff2",
-      key: "staff2",
-      render: (user) => user?.fullName,
-    },
-    {
-      title: "Hình ảnh",
-      dataIndex: "evidence",
-      key: "evidence",
-      render: (image) => (
-        <Image
-          src={image}
-          style={{ width: 200 }}
-          placeholder="day la hinh anh"
-        />
-      ),
-    },
-    {
-      title: "Biển số xe",
-      dataIndex: "licensePlate",
-      key: "licensePlate",
-    },
-    {
-      title: "Vị trí",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: "Thao tác",
-      render: (value, record) => (
-        <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Chi tiết</Button>
-          {value.status === "COMING" && (
-            <>
-              {user.userID === value.staff1?.id &&
-                !value.staff1?.confirmStaff && (
-                  <Button
-                    onClick={() => handleConfirmStaff(record.id, user.userID)}
-                  >
-                    Tôi đã đến nơi
-                  </Button>
-                )}
-
-              {user.userID === value.staff2?.id &&
-                !value.staff2?.confirmStaff && (
-                  <Button
-                    onClick={() => handleConfirmStaff(record.id, user.userID)}
-                  >
-                    Tôi đã đến nơi
-                  </Button>
-                )}
-
-              {value.staff1?.confirmStaff && value.staff2?.confirmStaff && (
-                <Button disabled>Đã xác nhận đủ</Button>
-              )}
-
-              {value.staff1?.confirmStaff &&
-                user.userID === value.staff2?.id &&
-                !value.staff2?.confirmStaff && (
-                  <Button disabled>Chờ bạn xác nhận</Button>
-                )}
-
-              {value.staff2?.confirmStaff &&
-                user.userID === value.staff1?.id &&
-                !value.staff1?.confirmStaff && (
-                  <Button disabled>Chờ bạn xác nhận</Button>
-                )}
-            </>
-          )}
-
-          {value.status === "CHECKING" && (
-            <>
-              <Button
-                onClick={() => {
-                  fetchServices();
-                  setIsModalOpen(true);
-                  setSelectedBooking(record);
-                }}
-              >
-                Báo giá
-              </Button>
-              <Button
-                danger
-                onClick={() => {
-                  updateBookingStatus(record.id, "CANCELLED");
-                }}
-              >
-                Hủy
-              </Button>
-            </>
-          )}
-
-          {value.status === "PENDING_PAYMENT" && (
-            <Button disabled>Chờ khách hàng thanh toán</Button>
-          )}
-          {value.status === "IN_PROGRESS" && (
-            <Button
-              onClick={() => {
-                updateBookingStatus(record.id, "FINISHED");
-              }}
-              type="primary"
-            >
-              Đã hoàn thành
-            </Button>
-          )}
-        </div>
-      ),
-    },
-  ];
+  }, [totalDiscount]);
 
   const handleCheckboxChange = (checked, serviceId) => {
     const selectedService = services.find(
       (service) => service.id === serviceId
     );
+    const price = selectedService?.price || 0;
 
     if (checked) {
       setSelectedServices([...selectedServices, serviceId]);
-      setTotalPrice((prevTotal) => prevTotal + (selectedService?.price || 0));
+      setTotalPrice((prevTotal) => prevTotal + price);
     } else {
       setSelectedServices(
         selectedServices.filter((item) => item !== serviceId)
       );
-      setTotalPrice((prevTotal) => prevTotal - (selectedService?.price || 0));
+      setTotalPrice((prevTotal) => prevTotal - price);
     }
   };
 
-  const serviceColumns = [
-    {
-      title: "Chọn",
-      dataIndex: "id",
-      key: "id",
-      render: (value) => (
-        <Checkbox
-          checked={selectedServices.includes(value)}
-          onChange={(e) => handleCheckboxChange(e.target.checked, value)}
-        />
-      ),
-    },
-    {
-      title: "Tên dịch vụ",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
-      render: (value) => changeCurr(value),
-    },
-  ];
-
-  // const handleConfirmCompletion = async () => {
-  //   if (!selectedBooking) {
-  //     toast.error("Lỗi: Không tìm thấy ID của booking!");
-  //     return;
-  //   }
-  //   if (selectedServices.length === 0) {
-  //     toast.error("Chọn ít nhất 1 dịch vụ trước khi tiếp tục");
-  //     return;
-  //   }
-  //   try {
-  //     const res = await api.put(`/bookings/${selectedBooking}/status`, {
-  //       status: "PENDING_PAYMENT",
-  //       totalPrice,
-  //       services: selectedServices,
-  //     });
-  //     console.log(res);
-  //     if (!res.data.errorCode) {
-  //       toast.success("Cập nhật thành công");
-  //       fetchBookingsByStaffId();
-  //       setIsModalOpen(false);
-  //     } else {
-  //       toast.error("Có lỗi xảy ra");
-  //     }
-  //     // Refresh dữ liệu sau khi cập nhật
-  //   } catch (error) {
-  //     toast.error(error.message);
-  //   }
-  // };
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={["1"]}
-          mode="inline"
-          items={items}
-        />
+      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          <Menu.Item key="1" onClick={() => navigate("/admin/staff")}>
+            Quản lí cứu hộ
+          </Menu.Item>
+        </Menu>
       </Sider>
+
       <Layout>
         <Content style={{ margin: "0 16px" }}>
-          <Table dataSource={dataSource} columns={columns} />
+          <Table
+            dataSource={dataSource}
+            columns={[
+              { title: "Tên", dataIndex: "name", key: "name" },
+              { title: "Mô tả", dataIndex: "description", key: "description" },
+              { title: "Trạng thái", dataIndex: "status", key: "status" },
+              {
+                title: "Thao tác",
+                render: (value, record) => (
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <Button type="primary">Chi tiết</Button>
+                    {value.status === "CHECKING" && (
+                      <>
+                        <Button
+                          onClick={() => {
+                            fetchServices();
+                            setIsModalOpen(true);
+                            setSelectedBooking(record);
+                          }}
+                        >
+                          Báo giá
+                        </Button>
+                        <Button
+                          danger
+                          onClick={() =>
+                            updateBookingStatus(record.id, "CANCELLED")
+                          }
+                        >
+                          Hủy
+                        </Button>
+                      </>
+                    )}
+                    {value.status === "IN_PROGRESS" && (
+                      <Button
+                        type="primary"
+                        onClick={() =>
+                          updateBookingStatus(record.id, "FINISHED")
+                        }
+                      >
+                        Đã hoàn thành
+                      </Button>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
         </Content>
+
         <Footer style={{ textAlign: "center" }}>
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
         </Footer>
       </Layout>
+
       <Modal
         title="Xác nhận các dịch vụ đã thực hiện"
         open={isModalOpen}
@@ -338,27 +188,53 @@ const StaffLayout = () => {
           setIsModalOpen(false);
           setSelectedServices([]);
           setTotalPrice(0);
-          setSetTotalDiscount(null);
+          setTotalDiscount(0);
+          setIsButtonShow(false);
         }}
         onOk={handleChecking}
         okText="Xác nhận"
         cancelText="Hủy"
       >
         <p>Chọn các dịch vụ đã thực hiện trước khi hoàn thành nhiệm vụ:</p>
-        <Table dataSource={services} columns={serviceColumns} />
+        <Table
+          dataSource={services}
+          columns={[
+            {
+              title: "Chọn",
+              dataIndex: "id",
+              key: "id",
+              render: (value) => (
+                <Checkbox
+                  checked={selectedServices.includes(value)}
+                  onChange={(e) =>
+                    handleCheckboxChange(e.target.checked, value)
+                  }
+                />
+              ),
+            },
+            { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
+            {
+              title: "Giá",
+              dataIndex: "price",
+              key: "price",
+              render: changeCurr,
+            },
+          ]}
+        />
+
         <p>
           <strong>Tạm tính:</strong> {changeCurr(totalPrice)}
         </p>
         <p>
-          <strong>Tổng tiền:</strong>{" "}
-          {totalDiscount ? changeCurr(totalDiscount) : "Chưa tính"}
+          <strong>Tổng tiền:</strong> {changeCurr(totalDiscount)}
         </p>
-        {totalDiscount && (
+
+        {isButtonShow && (
           <Button
             type="primary"
-            onClick={() => {
-              updateBookingStatus(selectedBooking.id, "PENDING_PAYMENT");
-            }}
+            onClick={() =>
+              updateBookingStatus(selectedBooking.id, "PENDING_PAYMENT")
+            }
           >
             Đồng ý sửa
           </Button>

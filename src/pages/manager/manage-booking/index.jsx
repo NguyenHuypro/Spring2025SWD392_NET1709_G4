@@ -30,7 +30,7 @@ export default function BookingManagement() {
       const res = await api.get("/users/available-staffs");
       if (!res.data.errorCode) {
         setStaffs(res.data);
-        setIsModalOpen(true); // Mở modal sau khi lấy dữ liệu
+        setIsModalOpen(true);
       }
     } catch (error) {
       toast.error(error.message);
