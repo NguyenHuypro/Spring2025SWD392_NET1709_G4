@@ -127,7 +127,13 @@ const AdminLayout = () => {
       const res = await api.get("/Dashboard/dashboard-data");
       console.log(res.data.result);
       if (!res.data.errorCode) {
-        setStats(res.data);
+        setStats({
+          bookingCount: res.data.result.bookingCount || 0,
+          packageCount: res.data.result.packageCount || 0,
+          serviceCount: res.data.result.serviceCount || 0,
+          staffCount: res.data.result.staffCount || 0,
+          userCount: res.data.result.customerCount || 0,
+        });
       } else {
         toast.error("Không thể lấy dữ liệu thống kê.");
       }
@@ -182,47 +188,10 @@ const AdminLayout = () => {
         <Menu theme="dark" defaultSelectedKeys={["dashboard"]} mode="inline" items={items} />
       </Sider>
       <Layout>
-        <Content style={{ margin: "16px" }}>
+<Content style={{ margin: "16px" }}>
           
           {/*  Show statistics only on /admin/dashboard */}
-          {location.pathname === "/admin/dashboard" && (
-            <>
-              <Row gutter={16} style={{ marginBottom: "20px" }}>
-                <Col span={8}>
-                  <Card title="Nhân viên" bordered={false}>
-                    <UserOutlined style={{ fontSize: "30px", color: "#1890ff" }} />
-                    <h2>{stats.staffCount}</h2>
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card title="Khách hàng" bordered={false}>
-                    <TeamOutlined style={{ fontSize: "30px", color: "#52c41a" }} />
-                    <h2>{stats.userCount}</h2>
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card title="Booking" bordered={false}>
-                    <FileDoneOutlined style={{ fontSize: "30px", color: "#faad14" }} />
-                    <h2>{stats.bookingCount}</h2>
-                  </Card>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Card title="Gói dịch vụ" bordered={false}>
-                    <AppstoreOutlined style={{ fontSize: "30px", color: "#722ed1" }} />
-                    <h2>{stats.packageCount}</h2>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card title="Dịch vụ cứu hộ" bordered={false}>
-                    <CarOutlined style={{ fontSize: "30px", color: "#eb2f96" }} />
-                    <h2>{stats.serviceCount}</h2>
-                  </Card>
-                </Col>
-              </Row>
-            </>
-          )}
+          {location.pathname === "/admin/dashboard" }
 
           {/* Nơi hiển thị các trang con */}
           <Outlet />

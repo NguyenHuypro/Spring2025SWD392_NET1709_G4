@@ -14,6 +14,7 @@ export default function DashboardManagement() {
     serviceCount: 0,
     staffCount: 0,
     userCount: 0,
+    totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -33,6 +34,7 @@ export default function DashboardManagement() {
         api.get("/services"),
         api.get("/users/staffs"),
         api.get("/users/customers"),
+        api.get("/revenue/monthly"),
       ]);
 
       setStats({
@@ -41,6 +43,7 @@ export default function DashboardManagement() {
         serviceCount: services.data.result.length,
         staffCount: staffs.data.result.length,
         userCount: users.data.result.length,
+        totalRevenue: revenue.data.result.total || 0,
       });
     } catch (error) {
       toast.error("Error fetching statistics.");
@@ -50,13 +53,20 @@ export default function DashboardManagement() {
   };
 
   const data = {
-    labels: ["Bookings", "Packages", "Services", "Staff", "Users"],
+    labels: ["Bookings", "Packages", "Services", "Staff", "Users", "Revenue"],
     datasets: [
       {
         label: "Total Count",
-        data: [stats.bookingCount, stats.packageCount, stats.serviceCount, stats.staffCount, stats.userCount],
-        backgroundColor: ["#3498db", "#2ecc71", "#f1c40f", "#9b59b6", "#e74c3c"],
-        borderColor: ["#2980b9", "#27ae60", "#f39c12", "#8e44ad", "#c0392b"],
+        data: [
+          stats.bookingCount, 
+          stats.packageCount, 
+          stats.serviceCount, 
+          stats.staffCount, 
+          stats.userCount, 
+          stats.totalRevenue // Add revenue to chart
+        ],
+        backgroundColor: ["#3498db", "#2ecc71", "#f1c40f", "#9b59b6", "#e74c3c", "#16a085"],
+        borderColor: ["#2980b9", "#27ae60", "#f39c12", "#8e44ad", "#c0392b", "#1abc9c"],
         borderWidth: 1,
       },
     ],
@@ -77,6 +87,16 @@ export default function DashboardManagement() {
             <Col span={12}><Card title="Total Staff">{stats.staffCount}</Card></Col>
             <Col span={12}><Card title="Total Users">{stats.userCount}</Card></Col>
           </Row>
+
+          {/* ✅ New Revenue Section */}
+          <Row gutter={16} style={{ marginTop: 20 }}>
+            <Col span={24}>
+              <Card title="Total Monthly Revenue ($)">
+                <h2 style={{ color: "#27ae60" }}>${stats.totalRevenue.toLocaleString()}</h2>
+              </Card>
+            </Col>
+          </Row>
+
           <div style={{ marginTop: 20 }}>
             <Bar data={data} />
           </div>
