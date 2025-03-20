@@ -27,6 +27,8 @@ function Login() {
           navigate("/admin/staff");
         } else if (res.data.result.role === "STAFF") {
           navigate("/staff");
+        } else if (res.data.result.role === "RECEPTIONIST") {
+          navigate("/receptionist");
         } else {
           navigate("/");
         }

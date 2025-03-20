@@ -71,8 +71,8 @@ const ReceptionistLayout = () => {
   const columns = [
     {
       title: "Khách hàng",
-      dataIndex: "Tên khách hàng",
-      key: "customerName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Số điện thoại",

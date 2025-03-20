@@ -27,10 +27,18 @@ import ReceptionistLayout from "../layout/receptionist";
 import ReceptionistBooking from "../pages/receptionist/checkorder";
 import DashboardManagement from "../pages/admin/manage-dashboard/Index";
 
-
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
   if (user?.role !== "CUSTOMER") {
+    toast.error("Bạn không có quyền thực hiện hành động này");
+    return <Navigate to={"/"} />;
+  }
+  return children;
+};
+
+export const ProtectedRouteReceptionist = ({ children }) => {
+  const user = useSelector(selectUser);
+  if (user?.role !== "RECEPTIONIST") {
     toast.error("Bạn không có quyền thực hiện hành động này");
     return <Navigate to={"/"} />;
   }
@@ -108,9 +116,9 @@ export const router = createBrowserRouter([
       {
         path: "/payment-success",
         element: (
-           //<ProtectedRouteUser>
+          //<ProtectedRouteUser>
           <PaymentSuccess />
-           //</ProtectedRouteUser>
+          //</ProtectedRouteUser>
         ),
       },
     ],
@@ -118,15 +126,14 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      //<ProtectedRouteAdmin>
+      <ProtectedRouteAdmin>
         <AdminLayout />
-      //</ProtectedRouteAdmin>
+      </ProtectedRouteAdmin>
     ),
     children: [
       {
         path: "/admin/dashboard", // Default dashboard route
         element: <DashboardManagement />,
-
       },
       {
         path: "/admin/staff",
@@ -161,11 +168,9 @@ export const router = createBrowserRouter([
   {
     path: "/receptionist",
     element: (
-
-       //<ProtectedRouteReceptionist>
+      <ProtectedRouteReceptionist>
         <ReceptionistLayout />
-       //</ProtectedRouteReceptionist>
-
+      </ProtectedRouteReceptionist>
     ),
     children: [
       {
