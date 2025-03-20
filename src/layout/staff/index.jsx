@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Layout, Menu, Modal, Table } from "antd";
+import { Button, Checkbox, Image, Layout, Menu, Modal, Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../redux/features/counterSlice";
@@ -21,7 +21,143 @@ const StaffLayout = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [isButtonShow, setIsButtonShow] = useState(false);
+  const columns = [
+    {
+      title: "Tên",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Nhân viên cứu hộ 1",
+      dataIndex: "staff1",
+      key: "staff1",
+      render: (user) => user?.fullName,
+    },
+    {
+      title: "Nhân viên cứu hộ 2",
+      dataIndex: "staff2",
+      key: "staff2",
+      render: (user) => user?.fullName,
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "evidence",
+      key: "evidence",
+      render: (image) => (
+        <Image
+          src={image}
+          style={{ width: 200 }}
+          placeholder="day la hinh anh"
+        />
+      ),
+    },
+    {
+      title: "Biển số xe",
+      dataIndex: "licensePlate",
+      key: "licensePlate",
+    },
+    {
+      title: "Vị trí",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Thao tác",
+      render: (value, record) => (
+        <div style={{ display: "flex", gap: 10 }}>
+          <Button type="primary">Chi tiết</Button>
+          {value.status === "COMING" && (
+            <>
+              {user.userID === value.staff1?.id &&
+                !value.staff1?.confirmStaff && (
+                  <Button
+                    onClick={() => handleConfirmStaff(record.id, user.userID)}
+                  >
+                    Tôi đã đến nơi
+                  </Button>
+                )}
 
+              {user.userID === value.staff2?.id &&
+                !value.staff2?.confirmStaff && (
+                  <Button
+                    onClick={() => handleConfirmStaff(record.id, user.userID)}
+                  >
+                    Tôi đã đến nơi
+                  </Button>
+                )}
+
+              {value.staff1?.confirmStaff && value.staff2?.confirmStaff && (
+                <Button disabled>Đã xác nhận đủ</Button>
+              )}
+
+              {value.staff1?.confirmStaff &&
+                user.userID === value.staff2?.id &&
+                !value.staff2?.confirmStaff && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+
+              {value.staff2?.confirmStaff &&
+                user.userID === value.staff1?.id &&
+                !value.staff1?.confirmStaff && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+            </>
+          )}
+
+          {value.status === "CHECKING" && (
+            <>
+              <Button
+                onClick={() => {
+                  fetchServices();
+                  setIsModalOpen(true);
+                  setSelectedBooking(record);
+                }}
+              >
+                Báo giá
+              </Button>
+              <Button
+                danger
+                onClick={() => {
+                  updateBookingStatus(record.id, "CANCELLED");
+                }}
+              >
+                Hủy
+              </Button>
+            </>
+          )}
+
+          {value.status === "PENDING_PAYMENT" && (
+            <Button disabled>Chờ khách hàng thanh toán</Button>
+          )}
+          {value.status === "IN_PROGRESS" && (
+            <Button
+              onClick={() => {
+                updateBookingStatus(record.id, "FINISHED");
+              }}
+              type="primary"
+            >
+              Đã hoàn thành
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
   useEffect(() => {
     fetchBookingsByStaffId();
   }, []);
@@ -139,95 +275,7 @@ const StaffLayout = () => {
 
       <Layout>
         <Content style={{ margin: "0 16px" }}>
-          <Table
-            dataSource={dataSource}
-            columns={[
-              { title: "Tên", dataIndex: "name", key: "name" },
-              { title: "Mô tả", dataIndex: "description", key: "description" },
-              { title: "Trạng thái", dataIndex: "status", key: "status" },
-              {
-                title: "Thao tác",
-                render: (value, record) => (
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <Button type="primary">Chi tiết</Button>
-                    {value.status === "COMING" && (
-                      <>
-                        {user.userID === value.staff1?.id &&
-                          !value.staff1?.confirmStaff && (
-                            <Button
-                              onClick={() =>
-                                handleConfirmStaff(record.id, user.userID)
-                              }
-                            >
-                              Tôi đã đến nơi
-                            </Button>
-                          )}
-
-                        {user.userID === value.staff2?.id &&
-                          !value.staff2?.confirmStaff && (
-                            <Button
-                              onClick={() =>
-                                handleConfirmStaff(record.id, user.userID)
-                              }
-                            >
-                              Tôi đã đến nơi
-                            </Button>
-                          )}
-
-                        {value.staff1?.confirmStaff &&
-                          value.staff2?.confirmStaff && (
-                            <Button disabled>Đã xác nhận đủ</Button>
-                          )}
-
-                        {value.staff1?.confirmStaff &&
-                          user.userID === value.staff2?.id &&
-                          !value.staff2?.confirmStaff && (
-                            <Button disabled>Chờ bạn xác nhận</Button>
-                          )}
-
-                        {value.staff2?.confirmStaff &&
-                          user.userID === value.staff1?.id &&
-                          !value.staff1?.confirmStaff && (
-                            <Button disabled>Chờ bạn xác nhận</Button>
-                          )}
-                      </>
-                    )}
-                    {value.status === "CHECKING" && (
-                      <>
-                        <Button
-                          onClick={() => {
-                            fetchServices();
-                            setIsModalOpen(true);
-                            setSelectedBooking(record);
-                          }}
-                        >
-                          Báo giá
-                        </Button>
-                        <Button
-                          danger
-                          onClick={() =>
-                            updateBookingStatus(record.id, "CANCELLED")
-                          }
-                        >
-                          Hủy
-                        </Button>
-                      </>
-                    )}
-                    {value.status === "IN_PROGRESS" && (
-                      <Button
-                        type="primary"
-                        onClick={() =>
-                          updateBookingStatus(record.id, "FINISHED")
-                        }
-                      >
-                        Đã hoàn thành
-                      </Button>
-                    )}
-                  </div>
-                ),
-              },
-            ]}
-          />
+          <Table dataSource={dataSource} columns={columns} />
         </Content>
 
         <Footer style={{ textAlign: "center" }}>
