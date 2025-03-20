@@ -200,7 +200,18 @@ function Header() {
                     disabled={!selectedDistrict}
                   />
                 </FormItem>
-
+                <FormItem
+                  label="Địa chỉ cụ thể"
+                  name="location"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Địa chỉ cụ thể không được để trống",
+                    },
+                  ]}
+                >
+                  <Input />
+                </FormItem>
                 <FormItem
                   label="Tình trạng"
                   name="description"
@@ -227,18 +238,6 @@ function Header() {
                     },
                   ]}
                   initialValue={user.phone}
-                >
-                  <Input />
-                </FormItem>
-                <FormItem
-                  label="Địa chỉ cụ thể"
-                  name="location"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Địa chỉ cụ thể không được để trống",
-                    },
-                  ]}
                 >
                   <Input />
                 </FormItem>
