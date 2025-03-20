@@ -14,11 +14,10 @@ function Profile() {
   const dispatch = useDispatch();
 
   const handleSubmitForm = async (value) => {
-    console.log(value);
     try {
       const res = await api.put("/users", value);
-      if (!res.data.errorCode) {
-        dispatch(login(res?.data));
+      if (res.data.isSuccess) {
+        dispatch(login(res?.data?.result));
         toast.success("Chỉnh sửa thành công");
         setIsDisabled(true);
       } else {
