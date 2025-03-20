@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Image, Layout, Menu, Modal, Table } from "antd";
+import { Button, Checkbox, Layout, Menu, Modal, Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../redux/features/counterSlice";
@@ -40,7 +40,7 @@ const StaffLayout = () => {
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       const res = await api.put(`/bookings/${bookingId}/status`, {
-        status: statusToUpdate,
+        status: newStatus,
       });
 
       if (!res.data.errorCode) {
@@ -64,6 +64,18 @@ const StaffLayout = () => {
       } else {
         toast.error(res.data.message);
       }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleConfirmStaff = async (bookingId, staffId) => {
+    try {
+      const res = await api.post(
+        `/bookings/${bookingId}/confirm-staff/${staffId}`
+      );
+      fetchBookingsByStaffId();
+      console.log(res.data);
     } catch (error) {
       toast.error(error.message);
     }
@@ -138,6 +150,48 @@ const StaffLayout = () => {
                 render: (value, record) => (
                   <div style={{ display: "flex", gap: 10 }}>
                     <Button type="primary">Chi tiết</Button>
+                    {value.status === "COMING" && (
+                      <>
+                        {user.userID === value.staff1?.id &&
+                          !value.staff1?.confirmStaff && (
+                            <Button
+                              onClick={() =>
+                                handleConfirmStaff(record.id, user.userID)
+                              }
+                            >
+                              Tôi đã đến nơi
+                            </Button>
+                          )}
+
+                        {user.userID === value.staff2?.id &&
+                          !value.staff2?.confirmStaff && (
+                            <Button
+                              onClick={() =>
+                                handleConfirmStaff(record.id, user.userID)
+                              }
+                            >
+                              Tôi đã đến nơi
+                            </Button>
+                          )}
+
+                        {value.staff1?.confirmStaff &&
+                          value.staff2?.confirmStaff && (
+                            <Button disabled>Đã xác nhận đủ</Button>
+                          )}
+
+                        {value.staff1?.confirmStaff &&
+                          user.userID === value.staff2?.id &&
+                          !value.staff2?.confirmStaff && (
+                            <Button disabled>Chờ bạn xác nhận</Button>
+                          )}
+
+                        {value.staff2?.confirmStaff &&
+                          user.userID === value.staff1?.id &&
+                          !value.staff1?.confirmStaff && (
+                            <Button disabled>Chờ bạn xác nhận</Button>
+                          )}
+                      </>
+                    )}
                     {value.status === "CHECKING" && (
                       <>
                         <Button
