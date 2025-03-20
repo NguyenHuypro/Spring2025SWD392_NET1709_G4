@@ -20,9 +20,41 @@ function Header() {
   const [form] = useForm();
   const [cars, setCars] = useState([]);
   const [fileList, setFileList] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
 
   const handleChange = ({ fileList }) => {
     setFileList(fileList);
+  };
+
+  const fetchDistricts = async () => {
+    try {
+      fetch("/api-provinces/p/79?depth=2")
+        .then((res) => res.json())
+        .then((data) => {
+          setDistricts(() =>
+            data.districts.map((district) => ({
+              code: district.code,
+              name: district.name,
+            }))
+          );
+        });
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
+  const fetchWards = async (districtCode) => {
+    try {
+      fetch(`/api-provinces/d/${districtCode}?depth=2`)
+        .then((res) => res.json())
+        .then((data) => {
+          setWards(data.wards);
+        });
+    } catch (error) {
+      console.error("Error fetching wards:", error);
+    }
   };
 
   const showModal = () => {
@@ -51,6 +83,14 @@ function Header() {
 
   const handleSubmitForm = async (value) => {
     try {
+      await fetch(`/api-provinces/d/${value.district}`)
+        .then((res) => res.json())
+        .then((data) => {
+          value.district = data.name;
+        });
+
+      let newLocation = `${value.location} - ${value.ward} - ${value.district} - Thành phố Hồ Chí Minh`;
+      value.location = newLocation;
       const url = await uploadFile(value.image.fileList[0].originFileObj);
       value.evidence = url;
       const res = await api.post("/bookings", value);
@@ -90,6 +130,7 @@ function Header() {
               onClick={() => {
                 setIsModalOpen(true);
                 fetchCarByUserId();
+                fetchDistricts();
               }}
             >
               Đặt cứu hộ ngay
@@ -123,6 +164,42 @@ function Header() {
                     }))}
                   />
                 </FormItem>
+                <FormItem
+                  label="Quận/Huyện"
+                  name="district"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn quận/huyện" },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn quận/huyện"
+                    options={districts.map((d) => ({
+                      label: d.name,
+                      value: d.code,
+                    }))}
+                    onChange={(value) => {
+                      setSelectedDistrict(value);
+                      fetchWards(value);
+                    }}
+                  />
+                </FormItem>
+
+                <FormItem
+                  label="Phường/Xã"
+                  name="ward"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn phường/xã" },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn phường/xã"
+                    options={wards.map((w) => ({
+                      label: w.name,
+                      value: w.name,
+                    }))}
+                    disabled={!selectedDistrict}
+                  />
+                </FormItem>
 
                 <FormItem
                   label="Tình trạng"
@@ -154,12 +231,12 @@ function Header() {
                   <Input />
                 </FormItem>
                 <FormItem
-                  label="Địa điểm cứu hộ"
+                  label="Địa chỉ cụ thể"
                   name="location"
                   rules={[
                     {
                       required: true,
-                      message: "Địa điểm cứu hộ không được để trống",
+                      message: "Địa chỉ cụ thể không được để trống",
                     },
                   ]}
                 >
@@ -208,45 +285,6 @@ function Header() {
             </ul>
           </>
         )}
-        {/* {user?.role == "CUSTOMER" && (
-          <nav className="navbar navbar-expand-lg navbar-light">
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#navbarNav"
-              aria-controls="navbarNav"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarNav">
-              <ul className="navbar-nav">
-                <li className="nav-item active">
-                  <a className="nav-link" href="#">
-                    Home <span className="sr-only">(current)</span>
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    Features
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    Pricing
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link disabled" href="#">
-                    Disabled
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
-        )} */}
       </div>
       {user == null ? (
         <div className="header-right">
