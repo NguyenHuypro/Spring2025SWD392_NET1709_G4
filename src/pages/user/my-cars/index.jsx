@@ -116,7 +116,7 @@ function MyCars() {
     try {
       const res = await api.post("/cars", value);
       console.log(res);
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setDataSource([...dataSource, res.data.result]);
         form.resetFields();
         setIsModalOpen(false);
@@ -132,7 +132,7 @@ function MyCars() {
   const handleChangeColor = async () => {
     try {
       const res = await api.put(`/cars/${selectedCar}`, { color });
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setDataSource([...dataSource, res.data.result]);
         setColor("");
         setSelectedCar("");
@@ -151,7 +151,7 @@ function MyCars() {
       const res = await api.get("/cars/my-cars");
       console.log(res.data.result);
 
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setDataSource(res.data.result);
       } else {
         toast.error(res.data.message);
