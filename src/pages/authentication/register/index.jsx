@@ -13,7 +13,7 @@ function Register() {
       console.log(value);
       const res = await api.post("/auth/register", value);
       console.log(res);
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         toast.success(res.data.message);
         // navigate("/login");
       } else {

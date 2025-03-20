@@ -17,16 +17,7 @@ function Login() {
     try {
       const res = await api.post("/auth/login", value);
       console.log(res.data);
-      if (!res.data.errorCode) {
-        // localStorage.setItem("token", res?.data?.access_token);
-        // dispatch(login(res?.data));
-        // if (res.data.role === "ADMIN" || res.data.role === "MANAGER") {
-        //   navigate("/admin/staff");
-        // } else if (res.data.role === "STAFF") {
-        //   navigate("/staff");
-        // } else {
-        //   navigate("/");
-        // }
+      if (res.data.isSuccess) {
         localStorage.setItem("token", res?.data?.result.accessToken);
         dispatch(login(res?.data?.result));
         if (
@@ -45,7 +36,7 @@ function Login() {
         toast.error(res.data.message);
       }
     } catch (error) {
-      toast.error("Sai email hoặc mật khẩu");
+      toast.error("Sai email hoặc mật khẩu", error.message);
     }
   };
 
