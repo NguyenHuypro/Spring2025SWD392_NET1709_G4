@@ -327,6 +327,7 @@ export default function BookingManagement() {
         okText="Xác nhận"
         cancelText="Hủy"
       >
+        <p>Tên trạm: {staffs[0]?.rescueStationName}</p>
         <p>Vui lòng chọn đúng 2 nhân viên cứu hộ:</p>
         <Select
           mode="multiple"
