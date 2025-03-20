@@ -160,7 +160,7 @@ export default function Package() {
         okButtonProps={{ disabled: !selectedCar }}
       >
         <Radio.Group onChange={handleCarChange} value={selectedCar}>
-          {cars.map((car) => {
+          {cars?.map((car) => {
             const packageName = car?.package?.name?.toLowerCase();
             const currentPackageName = currentPackage?.name?.toLowerCase();
 
