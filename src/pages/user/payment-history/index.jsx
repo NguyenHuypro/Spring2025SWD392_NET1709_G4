@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../configs/axios";
 import { changeCurr } from "../../../utils/utils";
+import moment from "moment-timezone";
 
 function PaymentHistory() {
   const [dataSource, setDataSource] = useState([]);
@@ -26,11 +27,18 @@ function PaymentHistory() {
       dataIndex: "licensePlate",
       key: "licensePlate",
     },
+
     {
       title: "Tổng tiền",
       dataIndex: "amount",
       key: "amount",
       render: (value) => changeCurr(value),
+    },
+    {
+      title: "Khởi tạo lúc",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (value) => moment(value).tz("Asia/Bangkok").format("DD-MM-YYYY"),
     },
     {
       title: "Trạng thái",
