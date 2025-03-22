@@ -281,6 +281,9 @@ function Header() {
               <li>
                 <Link to="/package">Gói dịch vụ</Link>
               </li>
+              <li>
+                <Link to="/payment-history">Lịch sử thanh toán</Link>
+              </li>
             </ul>
           </>
         )}

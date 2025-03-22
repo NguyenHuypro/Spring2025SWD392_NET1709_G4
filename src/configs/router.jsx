@@ -26,6 +26,7 @@ import PaymentSuccess from "../pages/user/payment-success";
 import ReceptionistLayout from "../layout/receptionist";
 import ReceptionistBooking from "../pages/receptionist/checkorder";
 import DashboardManagement from "../pages/admin/manage-dashboard/Index";
+import PaymentHistory from "../pages/user/payment-history";
 
 export const ProtectedRouteUser = ({ children }) => {
   const user = useSelector(selectUser);
@@ -116,9 +117,17 @@ export const router = createBrowserRouter([
       {
         path: "/payment-success",
         element: (
-          //<ProtectedRouteUser>
-          <PaymentSuccess />
-          //</ProtectedRouteUser>
+          <ProtectedRouteUser>
+            <PaymentSuccess />
+          </ProtectedRouteUser>
+        ),
+      },
+      {
+        path: "/payment-history",
+        element: (
+          // <ProtectedRouteUser>
+          <PaymentHistory />
+          // </ProtectedRouteUser>
         ),
       },
     ],
