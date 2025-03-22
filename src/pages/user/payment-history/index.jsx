@@ -15,8 +15,8 @@ function PaymentHistory() {
     {
       title: "Thanh toán cho",
       render: (value, record) => {
-        if (record.packageName) {
-          return `Gói dịch vụ: ${packageName}`;
+        if (record?.packageName) {
+          return `Gói dịch vụ: ${record?.packageName}`;
         }
         return "Cứu hộ";
       },
