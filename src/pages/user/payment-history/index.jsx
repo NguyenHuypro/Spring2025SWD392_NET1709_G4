@@ -41,15 +41,15 @@ function PaymentHistory() {
         let text = "";
 
         switch (value) {
-          case "pending":
+          case "PENDING":
             color = "gold";
             text = "Đang xử lý";
             break;
-          case "success":
+          case "SUCCESS":
             color = "green";
             text = "Thành công";
             break;
-          case "failed":
+          case "FAILED":
             color = "red";
             text = "Thất bại";
             break;
