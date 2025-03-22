@@ -21,6 +21,7 @@ const StaffLayout = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [isButtonShow, setIsButtonShow] = useState(false);
+  const [isDisable, setIsDisable] = useState(true);
   const columns = [
     {
       title: "Tên",
@@ -183,6 +184,7 @@ const StaffLayout = () => {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
         setIsModalOpen(false);
+        setIsDisable(true);
       } else {
         toast.error("Có lỗi xảy ra");
       }
@@ -236,6 +238,7 @@ const StaffLayout = () => {
       if (discount !== null && discount !== undefined) {
         setIsButtonShow(true);
       }
+      setIsDisable(false);
     } catch (error) {
       toast.error(error.message);
     }
@@ -337,6 +340,7 @@ const StaffLayout = () => {
             onClick={() =>
               updateBookingStatus(selectedBooking.id, "PENDING_PAYMENT")
             }
+            disabled={isDisable}
           >
             Đồng ý sửa
           </Button>
