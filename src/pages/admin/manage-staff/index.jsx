@@ -13,6 +13,7 @@ import {
 export default function StaffManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
+  const [stations, setStations] = useState([]);
 
   const columns = [
     {
@@ -44,7 +45,7 @@ export default function StaffManagement() {
           <Button type="primary">Thay đổi</Button>
           <Popconfirm
             title="Xóa"
-            description="Bạn có chắc là muốn xóa xe này không?"
+            description="Bạn có chắc là muốn xóa nhân viên này không?"
             // onConfirm={() => handleDeleteCar(id)}
             okText="Yes"
             cancelText="No"
@@ -59,8 +60,19 @@ export default function StaffManagement() {
   const fetchStaffs = async () => {
     try {
       const res = await api.get("/users/staffs");
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setDataSource(res.data.result);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const fetchStations = async () => {
+    try {
+      const res = await api.get("/stations");
+      if (res.data.isSuccess) {
+        setStations(res.data.result);
       }
     } catch (error) {
       toast.error(error.message);
@@ -85,6 +97,7 @@ export default function StaffManagement() {
 
   useState(() => {
     fetchStaffs();
+    fetchStations();
   }, []);
 
   return (
@@ -209,6 +222,23 @@ export default function StaffManagement() {
               <Input.Password
                 prefix={<LockOutlined />}
                 placeholder="Nhập xác nhận mật khẩu"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Chọn trạm"
+              name="rescueStation"
+              rules={[{ required: true, message: "Nhập mật khẩu" }]}
+            >
+              <Select
+                options={stations?.map((station) => ({
+                  label: station?.name,
+                  value: station?.id,
+                }))}
               />
             </Form.Item>
           </Col>
