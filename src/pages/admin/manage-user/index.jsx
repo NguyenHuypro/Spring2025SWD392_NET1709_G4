@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Table } from "antd";
+import { Table } from "antd";
 import { useState } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
@@ -21,25 +21,6 @@ export default function UserManagement() {
       title: "Email",
       dataIndex: "email",
       key: "email",
-    },
-    {
-      title: "Thao tác",
-      dataIndex: "id",
-      key: "id",
-      render: (id) => (
-        <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Thay đổi</Button>
-          <Popconfirm
-            title="Xóa"
-            description="Bạn có chắc là muốn xóa xe này không?"
-            // onConfirm={() => handleDeleteCar(id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button danger>Xóa</Button>
-          </Popconfirm>
-        </div>
-      ),
     },
   ];
 

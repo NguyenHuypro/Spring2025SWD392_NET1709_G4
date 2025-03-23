@@ -9,15 +9,14 @@ export default function PackageManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
   const [currentPackage, setCurrentPackage] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
-  const [services, setServices] = useState([]); // Danh sách dịch vụ
-  const [selectedServices, setSelectedServices] = useState([]); // Dịch vụ được chọn
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
 
   const fetchPackages = async () => {
     try {
       const res = await api.get("/packages");
-      console.log(res.data.result);
       if (!res.data.errorCode) {
         setDataSource(res.data.result);
       }
@@ -37,10 +36,6 @@ export default function PackageManagement() {
     }
   }, []);
 
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleCloseServiceModal = () => setIsServiceModalOpen(false);
-
   const handleSelectService = async () => {
     if (services.length === 0) await fetchServices();
     setIsServiceModalOpen(true);
@@ -57,23 +52,6 @@ export default function PackageManagement() {
     );
   }, []);
 
-  const handleSubmitForm = async (values) => {
-    try {
-      console.log(values);
-      const res = await api.post("/packages", values);
-      if (!res.data.errorCode) {
-        setDataSource([res.data.result, ...dataSource]);
-        form.resetFields();
-        setSelectedServices([]);
-        toast.success("Tạo gói dịch vụ mới thành công");
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
   const selectedServiceNames = useMemo(() => {
     return services
       .filter((service) => selectedServices.includes(service.id))
@@ -89,6 +67,41 @@ export default function PackageManagement() {
     ),
     [selectedServices, handleServiceCheckboxChange]
   );
+
+  const handleSubmitForm = async (values) => {
+    try {
+      const payload = {
+        ...values,
+        services: selectedServices,
+      };
+
+      if (isEditMode && currentPackage) {
+        const res = await api.put(`/packages/${currentPackage.id}`, payload);
+        if (!res.data.errorCode) {
+          toast.success("Cập nhật gói dịch vụ thành công");
+          form.resetFields();
+          setSelectedServices([]);
+          setCurrentPackage(null);
+          setIsEditMode(false);
+          fetchPackages();
+        } else {
+          toast.error(res.data.message);
+        }
+      } else {
+        const res = await api.post("/packages", payload);
+        if (!res.data.errorCode) {
+          setDataSource([res.data.result, ...dataSource]);
+          form.resetFields();
+          setSelectedServices([]);
+          toast.success("Tạo gói dịch vụ mới thành công");
+        } else {
+          toast.error(res.data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   const columns = [
     { title: "Tên", dataIndex: "name", key: "name" },
@@ -107,25 +120,48 @@ export default function PackageManagement() {
             type="primary"
             onClick={() => {
               setCurrentPackage(record);
-              setIsModalOpen(true);
+              Modal.info({
+                title: "Dịch vụ thuộc gói",
+                content: (
+                  <Table
+                    dataSource={record.services}
+                    columns={[
+                      { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
+                      {
+                        title: "Giá",
+                        dataIndex: "price",
+                        key: "price",
+                        render: (price) => changeCurr(price),
+                      },
+                    ]}
+                    pagination={false}
+                    rowKey="id"
+                  />
+                ),
+              });
             }}
-            style={{ marginRight: 20 }}
+            style={{ marginRight: 12 }}
           >
             Chi tiết
           </Button>
-          <Button>Chỉnh sửa</Button>
+          <Button
+            onClick={() => {
+              setIsEditMode(true);
+              setCurrentPackage(record);
+              setSelectedServices(record.services.map((s) => s.id));
+              form.setFieldsValue({
+                name: record.name,
+                description: record.description,
+                price: record.price,
+                services: record.services.map((s) => s.id),
+              });
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Chỉnh sửa
+          </Button>
         </>
       ),
-    },
-  ];
-
-  const serviceColumns = [
-    { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
-    {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => changeCurr(price),
     },
   ];
 
@@ -139,11 +175,27 @@ export default function PackageManagement() {
       render: (price) => changeCurr(price),
     },
   ];
+
   useEffect(() => {
     fetchPackages();
   }, []);
+
   return (
     <>
+      {isEditMode && (
+        <Button
+          onClick={() => {
+            setIsEditMode(false);
+            form.resetFields();
+            setSelectedServices([]);
+            setCurrentPackage(null);
+          }}
+          style={{ marginBottom: 16 }}
+        >
+          Hủy chỉnh sửa
+        </Button>
+      )}
+
       <Form
         form={form}
         onFinish={handleSubmitForm}
@@ -157,6 +209,10 @@ export default function PackageManagement() {
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
         }}
       >
+        <h2 style={{ textAlign: "center", color: "#1890ff", marginBottom: 20 }}>
+          {isEditMode ? "Chỉnh sửa gói dịch vụ" : "Tạo gói dịch vụ mới"}
+        </h2>
+
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -188,19 +244,20 @@ export default function PackageManagement() {
               <Input type="number" placeholder="Nhập giá" />
             </Form.Item>
           </Col>
-
           <Col span={12}>
             <Form.Item
               label="Chọn dịch vụ"
               name="services"
               rules={[{ required: true, message: "Vui lòng chọn dịch vụ" }]}
             >
-              <Button onClick={handleSelectService}>Nhấn để chọn</Button>
-              <p style={{ marginTop: "10px", color: "#1890ff" }}>
-                {selectedServiceNames.length > 0
-                  ? `Đã chọn: ${selectedServiceNames.join(", ")}`
-                  : "Chưa chọn dịch vụ nào"}
-              </p>
+              <>
+                <Button onClick={handleSelectService}>Nhấn để chọn</Button>
+                <p style={{ marginTop: "10px", color: "#1890ff" }}>
+                  {selectedServiceNames.length > 0
+                    ? `Đã chọn: ${selectedServiceNames.join(", ")}`
+                    : "Chưa chọn dịch vụ nào"}
+                </p>
+              </>
             </Form.Item>
           </Col>
         </Row>
@@ -212,21 +269,14 @@ export default function PackageManagement() {
             block
             style={{ fontSize: "16px", height: "50px" }}
           >
-            Tạo gói dịch vụ mới
+            {isEditMode ? "Cập nhật gói" : "Tạo gói dịch vụ mới"}
           </Button>
         </Form.Item>
       </Form>
 
-      <Modal open={isModalOpen} onCancel={handleCloseModal} title="Dịch vụ">
-        <Table
-          dataSource={currentPackage?.services || []}
-          columns={serviceColumns}
-        />
-      </Modal>
-
       <Modal
         open={isServiceModalOpen}
-        onCancel={handleCloseServiceModal}
+        onCancel={() => setIsServiceModalOpen(false)}
         onOk={handleConfirmServices}
         title="Chọn dịch vụ"
       >
@@ -238,7 +288,12 @@ export default function PackageManagement() {
         />
       </Modal>
 
-      <Table dataSource={dataSource} columns={columns} />
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        rowKey="id"
+        style={{ marginTop: 40 }}
+      />
     </>
   );
 }
