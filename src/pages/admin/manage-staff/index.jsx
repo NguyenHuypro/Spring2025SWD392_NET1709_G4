@@ -1,4 +1,14 @@
-import { Button, Col, Form, Input, Popconfirm, Row, Select, Table } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Row,
+  Select,
+  Table,
+} from "antd";
 import { useState } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
@@ -14,6 +24,8 @@ export default function StaffManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
   const [stations, setStations] = useState([]);
+  const [isModelOpen, setIsModelOpen] = useState(false);
+  const [form2] = useForm();
 
   const columns = [
     {
@@ -40,9 +52,17 @@ export default function StaffManagement() {
       title: "Thao tác",
       dataIndex: "id",
       key: "id",
-      render: (id) => (
+      render: (id, record) => (
         <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Thay đổi</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              form2.setFieldsValue(record);
+              setIsModelOpen(true);
+            }}
+          >
+            Thay đổi
+          </Button>
           <Popconfirm
             title="Xóa"
             description="Bạn có chắc là muốn xóa nhân viên này không?"
@@ -74,6 +94,18 @@ export default function StaffManagement() {
       if (res.data.isSuccess) {
         setStations(res.data.result);
       }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleSubmitForm2 = async (value) => {
+    try {
+      console.log(value);
+      const res = await api.put("/users", value);
+      setIsModelOpen(false);
+      fetchStaffs();
+      form2.resetFields();
     } catch (error) {
       toast.error(error.message);
     }
@@ -232,7 +264,7 @@ export default function StaffManagement() {
             <Form.Item
               label="Chọn trạm"
               name="rescueStation"
-              rules={[{ required: true, message: "Nhập mật khẩu" }]}
+              rules={[{ required: true, message: "Chọn trạm" }]}
             >
               <Select
                 options={stations?.map((station) => ({
@@ -256,6 +288,35 @@ export default function StaffManagement() {
           </Button>
         </Form.Item>
       </Form>
+      <Modal
+        title="Chỉnh sửa nhân viên"
+        open={isModelOpen}
+        onCancel={() => setIsModelOpen(false)}
+        onOk={() => form2.submit()}
+        onClose={() => setIsModelOpen(false)}
+      >
+        <Form form={form2} onFinish={handleSubmitForm2}>
+          rules={[{ required: true, message: "Nhập họ và tên" }]}
+          <Form.Item label="Họ và tên" name="fullName">
+            <Input prefix={<UserOutlined />} placeholder="Nhập họ và tên" />
+          </Form.Item>
+        </Form>
+        <Form.Item
+          label="Số điện thoại"
+          name="phone"
+          rules={[
+            { required: true, message: "Nhập số điện thoại" },
+            { len: 10, message: "Nhập số điện thoại hợp lệ" },
+          ]}
+        >
+          <Input
+            prefix={<PhoneOutlined />}
+            type="tel"
+            placeholder="Nhập số điện thoại"
+            maxLength={10}
+          />
+        </Form.Item>
+      </Modal>
       <Table dataSource={dataSource} columns={columns} />
     </>
   );
