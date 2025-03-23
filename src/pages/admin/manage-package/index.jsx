@@ -128,28 +128,33 @@ export default function PackageManagement() {
           <Button
             type="primary"
             onClick={() => {
-              setCurrentPackage(record);
+              const tableContent = (
+                <Table
+                  dataSource={record.services}
+                  columns={[
+                    { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
+                    {
+                      title: "Giá",
+                      dataIndex: "price",
+                      key: "price",
+                      render: (price) => changeCurr(price),
+                    },
+                  ]}
+                  pagination={false}
+                  rowKey="id"
+                />
+              );
+
               ModalInfo.info({
                 title: "Dịch vụ thuộc gói",
                 content: (
-                  <Table
-                    dataSource={record.services}
-                    columns={[
-                      { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
-                      {
-                        title: "Giá",
-                        dataIndex: "price",
-                        key: "price",
-                        render: (price) => changeCurr(price),
-                      },
-                    ]}
-                    pagination={false}
-                    rowKey="id"
-                  />
+                  <div style={{ maxHeight: 400, overflowY: "auto" }}>
+                    {tableContent}
+                  </div>
                 ),
+                width: 600,
               });
             }}
-            style={{ marginRight: 12 }}
           >
             Chi tiết
           </Button>
