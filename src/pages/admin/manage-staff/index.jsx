@@ -102,7 +102,8 @@ export default function StaffManagement() {
   const handleSubmitForm2 = async (value) => {
     try {
       console.log(value);
-      const res = await api.put("/users", value);
+      const res = await api.put(`/users/staff`, value);
+      console.log(res.data.result);
       setIsModelOpen(false);
       fetchStaffs();
       form2.resetFields();
@@ -296,6 +297,9 @@ export default function StaffManagement() {
         onClose={() => setIsModelOpen(false)}
       >
         <Form form={form2} onFinish={handleSubmitForm2} layout="vertical">
+          <Form.Item name="id" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Họ và tên"
             name="fullName"
