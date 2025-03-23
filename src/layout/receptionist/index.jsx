@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Layout, Menu, Modal, Table, Input, Select } from "antd";
+import { Button, Layout, Menu, Modal, Table, Input } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../redux/features/counterSlice";
 import api from "../../configs/axios";
 import { toast } from "react-toastify";
 
@@ -11,8 +9,7 @@ const { Content, Footer, Sider } = Layout;
 const ReceptionistLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
-  const [dataSource, setDataSource] = useState([]); // Danh sách booking
-  const user = useSelector(selectUser);
+  const [dataSource, setDataSource] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBooking, setNewBooking] = useState({
     customerName: "",
@@ -26,7 +23,7 @@ const ReceptionistLayout = () => {
     {
       key: "1",
       label: "Quản lý đặt lịch",
-      onClick: () => navigate("/admin/receptionist"), 
+      onClick: () => navigate("/admin/receptionist"),
     },
   ];
 
@@ -39,10 +36,10 @@ const ReceptionistLayout = () => {
       const res = await api.get("/bookings/guest");
       console.log(res.data.result);
       if (!res.data.errorCode) {
-        setDataSource(res.data);
+        setDataSource(res.data.result);
       }
     } catch (error) {
-      toast.error("Lỗi khi tải danh sách booking!");
+      toast.error("Lỗi khi tải danh sách booking!", error);
     }
   };
 
@@ -52,15 +49,13 @@ const ReceptionistLayout = () => {
 
   const handleSubmitBooking = async () => {
     try {
-      console.log(newBooking);
       const res = await api.post("/bookings/receptionist", newBooking);
-      console.log(res.data.result);
       if (!res.data.errorCode) {
         toast.success("Tạo booking thành công!");
         fetchBookings();
         setIsModalOpen(false);
         setNewBooking({
-          customerName: "",
+          name: "",
           phone: "",
           licensePlate: "",
           location: "",
@@ -77,19 +72,15 @@ const ReceptionistLayout = () => {
   const columns = [
     {
       title: "Khách hàng",
-      dataIndex: "Tên khách hàng",
-      key: "customerName",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
     },
-    {
-      title: "Loại xe",
-      dataIndex: "vehicleType",
-      key: "vehicleType",
-    },
+   
     {
       title: "Biển số xe",
       dataIndex: "licensePlate",
@@ -110,30 +101,37 @@ const ReceptionistLayout = () => {
       dataIndex: "status",
       key: "status",
     },
-    {
-      title: "Thao tác",
-      render: (value, record) => (
-        <div style={{ display: "flex", gap: 10 }}>
-          <Button type="primary">Chi tiết</Button>
-        </div>
-      ),
-    },
   ];
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+      >
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline" items={items} />
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={["1"]}
+          mode="inline"
+          items={items}
+        />
       </Sider>
       <Layout>
         <Content style={{ margin: "0 16px" }}>
-          <Button type="primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 16 }}>
+          <Button
+            type="primary"
+            onClick={() => setIsModalOpen(true)}
+            style={{ marginBottom: 16 }}
+          >
             Thêm Booking Mới
           </Button>
           <Table dataSource={dataSource} columns={columns} />
         </Content>
-        <Footer style={{ textAlign: "center" }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>
+        <Footer style={{ textAlign: "center" }}>
+          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+        </Footer>
       </Layout>
       <Modal
         title="Tiếp nhận Booking mới"
@@ -143,11 +141,41 @@ const ReceptionistLayout = () => {
         okText="Xác nhận"
         cancelText="Hủy"
       >
-        <Input placeholder="Tên khách hàng" name="customerName" value={newBooking.customerName} onChange={handleInputChange} style={{ marginBottom: 10 }} />
-        <Input placeholder="Số điện thoại" name="phone" value={newBooking.phone} onChange={handleInputChange} style={{ marginBottom: 10 }} />
-        <Input placeholder="Biển số xe" name="licensePlate" value={newBooking.licensePlate} onChange={handleInputChange} style={{ marginBottom: 10 }} />
-        <Input placeholder="Vị trí cứu hộ" name="location" value={newBooking.location} onChange={handleInputChange} style={{ marginBottom: 10 }} />
-        <Input.TextArea placeholder="Mô tả sự cố" name="description" value={newBooking.description} onChange={handleInputChange} style={{ marginBottom: 10 }} />
+        <Input
+          placeholder="Tên khách hàng"
+          name="customerName"
+          value={newBooking.customerName}
+          onChange={handleInputChange}
+          style={{ marginBottom: 10 }}
+        />
+        <Input
+          placeholder="Số điện thoại"
+          name="phone"
+          value={newBooking.phone}
+          onChange={handleInputChange}
+          style={{ marginBottom: 10 }}
+        />
+        <Input
+          placeholder="Biển số xe"
+          name="licensePlate"
+          value={newBooking.licensePlate}
+          onChange={handleInputChange}
+          style={{ marginBottom: 10 }}
+        />
+        <Input
+          placeholder="Vị trí cứu hộ"
+          name="location"
+          value={newBooking.location}
+          onChange={handleInputChange}
+          style={{ marginBottom: 10 }}
+        />
+        <Input.TextArea
+          placeholder="Mô tả sự cố"
+          name="description"
+          value={newBooking.description}
+          onChange={handleInputChange}
+          style={{ marginBottom: 10 }}
+        />
       </Modal>
     </Layout>
   );
