@@ -1,9 +1,19 @@
-import { Button, Col, Form, Input, Modal, Row, Table, Checkbox } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Modal as AntdModal,
+  Row,
+  Table,
+  Checkbox,
+} from "antd";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
 import { changeCurr } from "../../../utils/utils";
+import { Modal } from "antd";
 
 export default function PackageManagement() {
   const [dataSource, setDataSource] = useState([]);
@@ -274,7 +284,7 @@ export default function PackageManagement() {
         </Form.Item>
       </Form>
 
-      <Modal
+      <AntdModal
         open={isServiceModalOpen}
         onCancel={() => setIsServiceModalOpen(false)}
         onOk={handleConfirmServices}
@@ -286,7 +296,7 @@ export default function PackageManagement() {
           pagination={false}
           rowKey="id"
         />
-      </Modal>
+      </AntdModal>
 
       <Table
         dataSource={dataSource}
