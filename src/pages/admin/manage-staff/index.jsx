@@ -295,27 +295,31 @@ export default function StaffManagement() {
         onOk={() => form2.submit()}
         onClose={() => setIsModelOpen(false)}
       >
-        <Form form={form2} onFinish={handleSubmitForm2}>
-          rules={[{ required: true, message: "Nhập họ và tên" }]}
-          <Form.Item label="Họ và tên" name="fullName">
+        <Form form={form2} onFinish={handleSubmitForm2} layout="vertical">
+          <Form.Item
+            label="Họ và tên"
+            name="fullName"
+            rules={[{ required: true, message: "Nhập họ và tên" }]}
+          >
             <Input prefix={<UserOutlined />} placeholder="Nhập họ và tên" />
           </Form.Item>
+
+          <Form.Item
+            label="Số điện thoại"
+            name="phone"
+            rules={[
+              { required: true, message: "Nhập số điện thoại" },
+              { len: 10, message: "Nhập số điện thoại hợp lệ" },
+            ]}
+          >
+            <Input
+              prefix={<PhoneOutlined />}
+              type="tel"
+              placeholder="Nhập số điện thoại"
+              maxLength={10}
+            />
+          </Form.Item>
         </Form>
-        <Form.Item
-          label="Số điện thoại"
-          name="phone"
-          rules={[
-            { required: true, message: "Nhập số điện thoại" },
-            { len: 10, message: "Nhập số điện thoại hợp lệ" },
-          ]}
-        >
-          <Input
-            prefix={<PhoneOutlined />}
-            type="tel"
-            placeholder="Nhập số điện thoại"
-            maxLength={10}
-          />
-        </Form.Item>
       </Modal>
       <Table dataSource={dataSource} columns={columns} />
     </>
