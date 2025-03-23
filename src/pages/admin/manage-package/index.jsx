@@ -13,7 +13,6 @@ import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
 import { changeCurr } from "../../../utils/utils";
-import { Modal as ModalInfo } from "antd";
 export default function PackageManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
