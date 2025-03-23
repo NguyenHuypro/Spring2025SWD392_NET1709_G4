@@ -64,6 +64,15 @@ export const ProtectedRouteStaff = ({ children }) => {
   return children;
 };
 
+export const ProtectedRouteReceptionist = ({ children }) => {
+  const user = useSelector(selectUser);
+  if (user?.role !== "RECEPTIONIST") {
+    toast.error("Bạn không có quyền thực hiện hành động này");
+    return <Navigate to={"/"} />;
+  }
+  return children;
+};
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -141,7 +150,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/admin/dashboard", // Default dashboard route
+        path: "/admin/dashboard",
         element: <DashboardManagement />,
       },
       {

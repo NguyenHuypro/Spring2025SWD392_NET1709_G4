@@ -54,7 +54,7 @@ const ReceptionistLayout = () => {
         fetchBookings();
         setIsModalOpen(false);
         setNewBooking({
-          customerName: "",
+          name: "",
           phone: "",
           licensePlate: "",
           location: "",
@@ -79,11 +79,7 @@ const ReceptionistLayout = () => {
       dataIndex: "phone",
       key: "phone",
     },
-    {
-      title: "Loại xe",
-      dataIndex: "vehicleType",
-      key: "vehicleType",
-    },
+   
     {
       title: "Biển số xe",
       dataIndex: "licensePlate",
