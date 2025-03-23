@@ -22,7 +22,8 @@ export default function PackageManagement() {
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
-
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailData, setDetailData] = useState([]);
   const fetchPackages = async () => {
     try {
       const res = await api.get("/packages");
@@ -128,33 +129,10 @@ export default function PackageManagement() {
           <Button
             type="primary"
             onClick={() => {
-              const tableContent = (
-                <Table
-                  dataSource={record.services}
-                  columns={[
-                    { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
-                    {
-                      title: "Giá",
-                      dataIndex: "price",
-                      key: "price",
-                      render: (price) => changeCurr(price),
-                    },
-                  ]}
-                  pagination={false}
-                  rowKey="id"
-                />
-              );
-
-              ModalInfo.info({
-                title: "Dịch vụ thuộc gói",
-                content: (
-                  <div style={{ maxHeight: 400, overflowY: "auto" }}>
-                    {tableContent}
-                  </div>
-                ),
-                width: 600,
-              });
+              setDetailData(record.services);
+              setIsDetailModalOpen(true);
             }}
+            style={{ marginRight: 12 }}
           >
             Chi tiết
           </Button>
@@ -302,6 +280,28 @@ export default function PackageManagement() {
         />
       </AntdModal>
 
+      <AntdModal
+        open={isDetailModalOpen}
+        onCancel={() => setIsDetailModalOpen(false)}
+        footer={null}
+        title="Danh sách dịch vụ trong gói"
+        width={600}
+      >
+        <Table
+          dataSource={detailData}
+          columns={[
+            { title: "Tên dịch vụ", dataIndex: "name", key: "name" },
+            {
+              title: "Giá",
+              dataIndex: "price",
+              key: "price",
+              render: (price) => changeCurr(price),
+            },
+          ]}
+          pagination={false}
+          rowKey="id"
+        />
+      </AntdModal>
       <Table
         dataSource={dataSource}
         columns={columns}
