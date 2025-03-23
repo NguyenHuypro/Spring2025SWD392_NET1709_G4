@@ -13,8 +13,7 @@ import api from "../../../configs/axios";
 import { toast } from "react-toastify";
 import { useForm } from "antd/es/form/Form";
 import { changeCurr } from "../../../utils/utils";
-import { Modal } from "antd";
-
+import { Modal as ModalInfo } from "antd";
 export default function PackageManagement() {
   const [dataSource, setDataSource] = useState([]);
   const [form] = useForm();
@@ -130,7 +129,7 @@ export default function PackageManagement() {
             type="primary"
             onClick={() => {
               setCurrentPackage(record);
-              Modal.info({
+              ModalInfo.info({
                 title: "Dịch vụ thuộc gói",
                 content: (
                   <Table
