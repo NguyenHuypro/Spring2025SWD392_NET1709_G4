@@ -14,7 +14,6 @@ export default function DashboardManagement() {
     packageCount: 0,
     serviceCount: 0,
     staffCount: 0,
-    receptionistCount :0,
     userCount: 0,
     totalRevenue: 0,
   });
@@ -23,7 +22,6 @@ export default function DashboardManagement() {
   useEffect(() => {
     fetchStats();
   }, []);
-
   const [monthlyRevenueData, setMonthlyRevenueData] = useState(new Array(12).fill(0));
 
   const fetchStats = async () => {
@@ -31,15 +29,15 @@ export default function DashboardManagement() {
       const res = await api.get("/Dashboard/dashboard-data");
       console.log(res.data.result);
       setLoading(true);
-      // // Fetch all necessary counts in parallel for better efficiency
-      // const [bookings, packages, services, staffs, users] = await Promise.all([
-      //   api.get("/bookings"),
-      //   api.get("/packages"),
-      //   api.get("/services"),
-      //   api.get("/users/staffs"),
-      //   api.get("/users/customers"),
-      //   api.get("/revenue/monthly"),
-      // ]);
+      // Fetch all necessary counts in parallel for better efficiency
+      //const [bookings, packages, services, staffs, users] = await Promise.all([
+      //  api.get("/bookings"),
+      //  api.get("/packages"),
+      //  api.get("/services"),
+      //  api.get("/users/staffs"),
+      //  api.get("/users/customers"),
+      //  api.get("/revenue/monthly"),
+      //]);
 
       setStats({
         bookingCount: res.data.result.bookingCount,
@@ -48,29 +46,26 @@ export default function DashboardManagement() {
         staffCount: res.data.result.staffCount,
         receptionistCount : res.data.result.receptionistCount,
         userCount: res.data.result.customerCount,
-      
         totalRevenue: res.data.result.monthlyRevenue,
       });
-
-      // 🔹 Xử lý doanh thu theo tháng
-    const monthlyData = new Array(12).fill(0); // Mặc định mỗi tháng là 0
-    res.data.result.monthlyRevenue.monthlyData.forEach((item) => {
-      monthlyData[item.month - 1] = item.total; // Gán doanh thu vào đúng tháng (month bắt đầu từ 1)
-    });
-    setMonthlyRevenueData(monthlyData);
-
-
+      const monthlyData = new Array(12).fill(0); 
+      res.data.result.monthlyRevenues.forEach((item) => {
+        monthlyData[item.month - 1] = item.revenue; 
+      });
+      setMonthlyRevenueData(monthlyData);
     } catch (error) {
       toast.error("Error fetching statistics.");
     } finally {
       setLoading(false);
     }
   };
+  
+
   const data = {
     labels: ["Bookings", "GÓI", "DỊCH VỤ", "NHÂN VIÊN", "LỄ TÂN", "KHÁCH HÀNG"],
     datasets: [
       {
-        label: "Total Count",
+        label: "Số lượng",
         data: [
           stats.bookingCount, 
           stats.packageCount, 
@@ -87,22 +82,22 @@ export default function DashboardManagement() {
   };
 
   const revenueChartData = {
-  labels: [
-    "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
-    "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
-  ],
-  datasets: [
-    {
-      label: "Doanh Thu (VND)",
-      data: monthlyRevenueData, // 💰 Dữ liệu doanh thu của từng tháng
-      backgroundColor: "#16a085",
-      borderColor: "#1abc9c",
-      borderWidth: 1,
-    },
-  ],
-};
-  
-return (
+    labels: [
+      "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+      "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+    ],
+    datasets: [
+      {
+        label: "Doanh Thu (VND)",
+        data: monthlyRevenueData, // Dữ liệu doanh thu của từng tháng
+        backgroundColor: "#16a085",
+        borderColor: "#1abc9c",
+        borderWidth: 1,
+      },
+    ],
+  }
+
+  return (
     <div style={{ padding: 20 }}>
       {loading ? (
         <Spin size="large" style={{ display: "flex", justifyContent: "center", marginTop: 50 }} />
@@ -119,7 +114,7 @@ return (
             <Col span={12}><Card title="Tổng người dùng">{stats.userCount}</Card></Col>
           </Row>
 
-          {/*  New Revenue Section */}
+          {/* ✅ New Revenue Section */}
           <Row gutter={16} style={{ marginTop: 20 }}>
             <Col span={24}>
               <Card title="Tổng doanh thu tháng">
@@ -128,13 +123,12 @@ return (
             </Col>
           </Row>
 
-          {/* <div style={{ marginTop: 20 }}>
-            <Bar data={data} />
-          </div> */}
 
-          {/* ✅ Biểu đồ doanh thu theo tháng */}
-        <div style={{ marginTop: 30 }}>
-          <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Biểu đồ doanh thu hàng tháng</h2>
+          <div style={{ marginTop: 20 }}>
+            <Bar data={data} />
+          </div>
+          <div style={{ marginTop: 30 }}>
+              <h2 style={{ textAlign: "center", color: "#2c3e50" }}>Biểu đồ doanh thu hàng tháng</h2>
           <Bar data={revenueChartData} />
         </div>
         </>
