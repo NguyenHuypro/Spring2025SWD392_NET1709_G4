@@ -110,15 +110,14 @@ function MyCars() {
   };
 
   const handleSubmitForm = async (value) => {
-    console.log("vô đây rồi");
+    console.log(value);
     try {
       if (isUpdate) {
         const res = await api.put(`/cars/${selectedCar.id}`, selectedCar);
         if (res.data.isSuccess) {
-          setDataSource([...dataSource, res.data.result]);
           setSelectedCar({});
-          await fetchCarByUserId();
           setIsUpdate(false);
+          await fetchCarByUserId();
           setIsModalOpen(false);
         } else {
           toast.error(res.data.message);
