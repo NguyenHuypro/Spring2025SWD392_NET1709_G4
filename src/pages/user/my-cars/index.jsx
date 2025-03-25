@@ -13,10 +13,6 @@ function MyCars() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [selectedCar, setSelectedCar] = useState({});
 
-  const handleOk = () => {
-    form.submit();
-  };
-
   const handleCancel = () => {
     form.resetFields();
     setIsModalOpen(false);
@@ -114,6 +110,7 @@ function MyCars() {
   };
 
   const handleSubmitForm = async (value) => {
+    console.log("vô đây rồi");
     try {
       if (isUpdate) {
         const res = await api.put(`/cars/${selectedCar.id}`, selectedCar);
@@ -176,7 +173,10 @@ function MyCars() {
         title={isUpdate ? "Thay đổi thông tin xe" : "Thêm xe mới"}
         open={isModalOpen}
         onCancel={handleCancel}
-        onOk={handleOk}
+        onOk={() => {
+          console.log("??");
+          form.submit();
+        }}
       >
         <Form form={form} labelCol={{ span: 24 }} onFinish={handleSubmitForm}>
           <FormItem
