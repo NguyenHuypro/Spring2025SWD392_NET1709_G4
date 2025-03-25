@@ -147,7 +147,7 @@ export default function Package() {
       <Modal
         open={isModalOpen}
         onCancel={handleCloseModal}
-        title={currentPackage.name}
+        title={currentPackage?.name}
       >
         <Table
           dataSource={currentPackage?.services || []}

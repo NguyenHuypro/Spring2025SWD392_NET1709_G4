@@ -63,6 +63,16 @@ function History() {
           >
             Xem chi tiết
           </Button>
+          {record?.status === "FINISH_CHECKING" && (
+            <Button
+              type="primary"
+              onClick={() => {
+                handleClickAccept(record.id);
+              }}
+            >
+              Đồng ý sửa
+            </Button>
+          )}
           {record?.status === "PENDING_PAYMENT" && (
             <Button
               type="primary"
@@ -81,11 +91,22 @@ function History() {
   const fetchBookingsByUserId = async () => {
     try {
       const res = await api.get(`/bookings/user`);
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setDataSource(res.data.result);
       } else {
         toast.error(res.data.message);
       }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleClickAccept = async (bookingId) => {
+    try {
+      const res = await api.put(`/bookings/${bookingId}/status`, {
+        status: "FINISH_CHECKING",
+      });
+      fetchBookingsByUserId();
     } catch (error) {
       toast.error(error.message);
     }

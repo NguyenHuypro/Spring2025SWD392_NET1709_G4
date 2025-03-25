@@ -20,6 +20,8 @@ import api from "../../configs/axios";
 import { toast } from "react-toastify";
 import { changeCurr } from "../../utils/utils";
 import moment from "moment-timezone";
+import "./index.scss";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -302,6 +304,12 @@ const StaffLayout = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+        <div className="test">
+          <div>
+            <UserOutlined style={{ fontSize: 30, color: "white" }} />
+          </div>
+          <h3>{user?.fullName || "???"}</h3>
+        </div>
         <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
           <Menu.Item key="1" onClick={() => navigate("/admin/staff")}>
             Quản lí cứu hộ
@@ -371,7 +379,7 @@ const StaffLayout = () => {
           <Button
             type="primary"
             onClick={() =>
-              updateBookingStatus(selectedBooking.id, "PENDING_PAYMENT")
+              updateBookingStatus(selectedBooking.id, "FINISH_CHECKING")
             }
             disabled={isDisable}
           >

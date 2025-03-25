@@ -125,9 +125,9 @@ export const router = createBrowserRouter([
       {
         path: "/payment-history",
         element: (
-          // <ProtectedRouteUser>
-          <PaymentHistory />
-          // </ProtectedRouteUser>
+          <ProtectedRouteUser>
+            <PaymentHistory />
+          </ProtectedRouteUser>
         ),
       },
     ],
@@ -135,9 +135,9 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <ProtectedRouteAdmin>
-        <AdminLayout />
-      </ProtectedRouteAdmin>
+      // <ProtectedRouteAdmin>
+      <AdminLayout />
+      // </ProtectedRouteAdmin>
     ),
     children: [
       {
@@ -169,9 +169,9 @@ export const router = createBrowserRouter([
   {
     path: "/staff",
     element: (
-      <ProtectedRouteStaff>
-        <StaffLayout />
-      </ProtectedRouteStaff>
+      // <ProtectedRouteStaff>
+      <StaffLayout />
+      // </ProtectedRouteStaff>
     ),
   },
   {
