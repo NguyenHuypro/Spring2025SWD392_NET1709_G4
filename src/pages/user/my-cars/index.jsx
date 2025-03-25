@@ -10,9 +10,8 @@ function MyCars() {
   const [form] = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataSource, setDataSource] = useState([]);
-  const [isModal2Open, setIsModal2Open] = useState(false);
-  const [color, setColor] = useState("");
-  const [selectedCar, setSelectedCar] = useState();
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [selectedCar, setSelectedCar] = useState({});
 
   const handleOk = () => {
     form.submit();
@@ -73,13 +72,15 @@ function MyCars() {
       title: "Thao tác",
       dataIndex: "id",
       key: "id",
-      render: (id) => (
+      render: (id, record) => (
         <div style={{ display: "flex", gap: 10 }}>
           <Button
             type="primary"
             onClick={() => {
-              setSelectedCar(id);
-              setIsModal2Open(true);
+              setSelectedCar(record);
+              setIsUpdate(true);
+              form.setFieldsValue(record);
+              setIsModalOpen(true);
             }}
           >
             Thay đổi
@@ -114,32 +115,26 @@ function MyCars() {
 
   const handleSubmitForm = async (value) => {
     try {
-      const res = await api.post("/cars", value);
-      console.log(res);
-      if (res.data.isSuccess) {
-        setDataSource([...dataSource, res.data.result]);
-        form.resetFields();
-        setIsModalOpen(false);
-        toast.success("Tạo xe mới thành công");
+      if (isUpdate) {
+        const res = await api.put(`/cars/${selectedCar.id}`, selectedCar);
+        if (res.data.isSuccess) {
+          setDataSource([...dataSource, res.data.result]);
+          setSelectedCar({});
+          await fetchCarByUserId();
+          setIsUpdate(false);
+        } else {
+          toast.error(res.data.message);
+        }
       } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleChangeColor = async () => {
-    try {
-      const res = await api.put(`/cars/${selectedCar}`, { color });
-      if (res.data.isSuccess) {
-        setDataSource([...dataSource, res.data.result]);
-        setColor("");
-        setSelectedCar("");
-        await fetchCarByUserId();
-        setIsModal2Open(false);
-      } else {
-        toast.error(res.data.message);
+        const res = await api.post("/cars", value);
+        if (res.data.isSuccess) {
+          setDataSource([...dataSource, res.data.result]);
+          form.resetFields();
+          setIsModalOpen(false);
+          toast.success("Tạo xe mới thành công");
+        } else {
+          toast.error(res.data.message);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -178,7 +173,7 @@ function MyCars() {
 
       <Table dataSource={dataSource} columns={columns} />
       <Modal
-        title="Thêm xe mới"
+        title={isUpdate ? "Thay đổi thông tin xe" : "Thêm xe mới"}
         open={isModalOpen}
         onCancel={handleCancel}
         onOk={handleOk}
@@ -194,7 +189,6 @@ function MyCars() {
               },
             ]}
           >
-            {/* <Input /> */}
             <Select
               options={[
                 { label: "Toyota", value: "Toyota" },
@@ -249,30 +243,21 @@ function MyCars() {
           <FormItem
             label="Biển số xe"
             name="licensePlate"
+            hidden={isUpdate ? true : false}
             rules={[
               {
                 required: true,
                 message: "Biển số xe không được để trống",
+              },
+              {
+                pattern: /^[0-9]{2}[A-Z]-[0-9]{4,5}$/,
+                message: "Số lượng chỗ ngồi chỉ được nhập tối đa 2 chữ số",
               },
             ]}
           >
             <Input />
           </FormItem>
         </Form>
-      </Modal>
-      <Modal
-        title="Thay đổi màu xe"
-        open={isModal2Open}
-        onCancel={() => {
-          setIsModal2Open(false);
-        }}
-        onOk={handleChangeColor}
-      >
-        <Input
-          onChange={(e) => {
-            setColor(e.target.value);
-          }}
-        />
       </Modal>
     </div>
   );
