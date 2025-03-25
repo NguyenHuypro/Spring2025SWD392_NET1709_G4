@@ -223,10 +223,10 @@ const StaffLayout = () => {
     try {
       const res = await api.put(`/bookings/${bookingId}/status`, {
         status: "FINISHED",
-        staffId: user.id,
+        staffId: user.userID,
       });
 
-      if (res.data.success) {
+      if (res.data.isSuccess) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
         setIsModalOpen(false);
@@ -257,7 +257,7 @@ const StaffLayout = () => {
         status: newStatus,
       });
 
-      if (res.data.success) {
+      if (res.data.isSuccess) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
         setIsModalOpen(false);
@@ -274,7 +274,7 @@ const StaffLayout = () => {
   const fetchServices = async () => {
     try {
       const res = await api.get("/services");
-      if (!res.data.errorCode) {
+      if (res.data.isSuccess) {
         setServices(res.data.result);
       } else {
         toast.error(res.data.message);
