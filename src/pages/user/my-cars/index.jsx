@@ -119,6 +119,7 @@ function MyCars() {
           setSelectedCar({});
           await fetchCarByUserId();
           setIsUpdate(false);
+          setIsModalOpen(false);
         } else {
           toast.error(res.data.message);
         }
@@ -251,7 +252,7 @@ function MyCars() {
               },
               {
                 pattern: /^[0-9]{2}[A-Z]-[0-9]{4,5}$/,
-                message: "Số lượng chỗ ngồi chỉ được nhập tối đa 2 chữ số",
+                message: "Biển số xe chưa đúng định dạng",
               },
             ]}
           >
