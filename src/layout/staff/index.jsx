@@ -171,15 +171,45 @@ const StaffLayout = () => {
           {value.status === "PENDING_PAYMENT" && (
             <Button disabled>Chờ khách hàng thanh toán</Button>
           )}
+
           {value.status === "IN_PROGRESS" && (
-            <Button
-              onClick={() => {
-                updateBookingStatus(record.id, "FINISHED");
-              }}
-              type="primary"
-            >
-              Đã hoàn thành
-            </Button>
+            <>
+              {user.userID === value.staff1?.id &&
+                !value.staff1?.confirmFinish && (
+                  <Button
+                    type="primary"
+                    onClick={() => handleConfirmFinish(record.id)}
+                  >
+                    Đã hoàn thành
+                  </Button>
+                )}
+
+              {user.userID === value.staff2?.id &&
+                !value.staff2?.confirmFinish && (
+                  <Button
+                    type="primary"
+                    onClick={() => handleConfirmFinish(record.id)}
+                  >
+                    Đã hoàn thành
+                  </Button>
+                )}
+
+              {value.staff1?.confirmFinish && value.staff2?.confirmFinish && (
+                <Button disabled>Đã xác nhận đủ</Button>
+              )}
+
+              {value.staff1?.confirmFinish &&
+                user.userID === value.staff2?.id &&
+                !value.staff2?.confirmFinish && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+
+              {value.staff2?.confirmFinish &&
+                user.userID === value.staff1?.id &&
+                !value.staff1?.confirmFinish && (
+                  <Button disabled>Chờ bạn xác nhận</Button>
+                )}
+            </>
           )}
         </div>
       ),
@@ -188,6 +218,27 @@ const StaffLayout = () => {
   useEffect(() => {
     fetchBookingsByStaffId();
   }, []);
+
+  const handleConfirmFinish = async (bookingId) => {
+    try {
+      const res = await api.put(`/bookings/${bookingId}/status`, {
+        status: "FINISHED",
+        staffId: user.id,
+      });
+
+      if (res.data.success) {
+        toast.success("Cập nhật thành công");
+        fetchBookingsByStaffId();
+        setIsModalOpen(false);
+        setIsDisable(true);
+      } else {
+        toast.error("Có lỗi xảy ra");
+      }
+      setIsButtonShow(false);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   const fetchBookingsByStaffId = async () => {
     try {

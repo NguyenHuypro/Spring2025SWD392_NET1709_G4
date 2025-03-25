@@ -113,7 +113,7 @@ function MyCars() {
     console.log(value);
     try {
       if (isUpdate) {
-        const res = await api.put(`/cars/${selectedCar.id}`, selectedCar);
+        const res = await api.put(`/cars/${selectedCar.id}`, value);
         if (res.data.isSuccess) {
           setSelectedCar({});
           setIsUpdate(false);
@@ -142,7 +142,6 @@ function MyCars() {
     try {
       const res = await api.get("/cars/my-cars");
       console.log(res.data.result);
-
       if (res.data.isSuccess) {
         setDataSource(res.data.result);
       } else {
