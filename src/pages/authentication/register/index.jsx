@@ -15,7 +15,7 @@ function Register() {
       console.log(res);
       if (res.data.isSuccess) {
         toast.success(res.data.message);
-        // navigate("/login");
+        navigate("/login");
       } else {
         toast.error(res.data.message);
       }

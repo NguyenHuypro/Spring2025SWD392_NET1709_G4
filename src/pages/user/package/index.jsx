@@ -144,7 +144,11 @@ export default function Package() {
       <Table dataSource={dataSource} columns={columns} />
 
       {/* Modal Chi Tiết Gói */}
-      <Modal open={isModalOpen} onCancel={handleCloseModal} title="Dịch vụ">
+      <Modal
+        open={isModalOpen}
+        onCancel={handleCloseModal}
+        title={currentPackage.name}
+      >
         <Table
           dataSource={currentPackage?.services || []}
           columns={serviceColumns}
