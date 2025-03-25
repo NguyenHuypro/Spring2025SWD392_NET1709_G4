@@ -206,7 +206,7 @@ const StaffLayout = () => {
         status: newStatus,
       });
 
-      if (!res.data.errorCode) {
+      if (res.data.success) {
         toast.success("Cập nhật thành công");
         fetchBookingsByStaffId();
         setIsModalOpen(false);
@@ -298,6 +298,7 @@ const StaffLayout = () => {
     IN_PROGRESS: { label: "Đang thực hiện", color: "processing" },
     PENDING_PAYMENT: { label: "Chờ thanh toán", color: "processing" },
     FINISHED: { label: "Hoàn thành", color: "success" },
+    FINISH_CHECKING: { label: "Đã kiểm tra xong", color: "processing" },
     CANCELLED: { label: "Đã hủy", color: "danger" },
   };
 

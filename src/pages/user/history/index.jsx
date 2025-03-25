@@ -104,7 +104,7 @@ function History() {
   const handleClickAccept = async (bookingId) => {
     try {
       const res = await api.put(`/bookings/${bookingId}/status`, {
-        status: "FINISH_CHECKING",
+        status: "PENDING_PAYMENT",
       });
       fetchBookingsByUserId();
     } catch (error) {
