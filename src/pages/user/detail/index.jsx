@@ -123,12 +123,12 @@ export default function Detail() {
                   if (index === booking.services.length - 1)
                     return (
                       <Text type="secondary" key={service.id}>
-                        {`${service?.name}`}
+                        {`${service?.name}(${changeCurr(service.price)})`}
                       </Text>
                     );
                   return (
                     <Text type="secondary" key={service.id}>
-                      {`${service?.name}, `}
+                      {`${service?.name}(${changeCurr(service.price)}), `}
                     </Text>
                   );
                 })}
