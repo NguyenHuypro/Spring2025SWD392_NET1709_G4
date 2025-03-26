@@ -140,6 +140,11 @@ export default function Detail() {
                     </Text>
                   );
                 })}
+                <br />
+                <Text type="secondary">
+                  Những dịch vụ miễn phí là do bạn đã mua gói dịch vụ đã bao gồm
+                  những dịch vụ đó
+                </Text>
               </Descriptions.Item>
               <Descriptions.Item label="Tổng tiền">
                 <Text type="danger">
