@@ -141,7 +141,7 @@ export default function Detail() {
                   );
                 })}
                 <br />
-                <Text type="secondary">
+                <Text type="danger">
                   Những dịch vụ miễn phí là do bạn đã mua gói dịch vụ đã bao gồm
                   những dịch vụ đó
                 </Text>
