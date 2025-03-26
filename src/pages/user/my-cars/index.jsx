@@ -81,15 +81,17 @@ function MyCars() {
           >
             Thay đổi
           </Button>
-          <Popconfirm
-            title="Xóa"
-            description="Bạn có chắc là muốn xóa xe này không?"
-            onConfirm={() => handleDeleteCar(id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button danger>Xóa</Button>
-          </Popconfirm>
+          {record.package == null && (
+            <Popconfirm
+              title="Xóa"
+              description="Bạn có chắc là muốn xóa xe này không?"
+              onConfirm={() => handleDeleteCar(id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger>Xóa</Button>
+            </Popconfirm>
+          )}
         </div>
       ),
     },
